@@ -1,4 +1,23 @@
+'use client'
+
+import { useState } from 'react'
+import { useAuth } from '@/lib/auth-context'
+import AuthModal from '@/components/auth-modal'
+
 export default function Home() {
+  const [authModalOpen, setAuthModalOpen] = useState(false)
+  const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin')
+  const { user, signOut } = useAuth()
+
+  const handleSignIn = () => {
+    setAuthMode('signin')
+    setAuthModalOpen(true)
+  }
+
+  const handleSignUp = () => {
+    setAuthMode('signup')
+    setAuthModalOpen(true)
+  }
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50">
       {/* Navigation */}
@@ -9,12 +28,32 @@ export default function Home() {
               <h1 className="text-2xl font-bold text-orange-600">🍳 RecipeShare</h1>
             </div>
             <div className="flex items-center space-x-4">
-              <button className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
-                Sign In
-              </button>
-              <button className="bg-orange-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-orange-700 transition-colors">
-                Sign Up
-              </button>
+              {user ? (
+                <div className="flex items-center space-x-4">
+                  <span className="text-gray-700">Welcome, {user.email}</span>
+                  <button 
+                    onClick={signOut}
+                    className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <button 
+                    onClick={handleSignIn}
+                    className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                  >
+                    Sign In
+                  </button>
+                  <button 
+                    onClick={handleSignUp}
+                    className="bg-orange-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-orange-700 transition-colors"
+                  >
+                    Sign Up
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -141,6 +180,13 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      {/* Auth Modal */}
+      <AuthModal 
+        isOpen={authModalOpen} 
+        onClose={() => setAuthModalOpen(false)} 
+        mode={authMode} 
+      />
     </div>
   );
 }

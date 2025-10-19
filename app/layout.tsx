@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { AuthProvider } from "@/lib/auth-context";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,7 +28,13 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <AuthProvider>
+          {/* Tailwind test badge: remove after verifying styles */}
+          <div className="fixed bottom-3 right-3 z-50 rounded-md bg-orange-600 px-2 py-1 text-xs font-medium text-white shadow-md">
+            Tailwind active
+          </div>
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );
