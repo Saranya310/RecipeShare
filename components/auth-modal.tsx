@@ -29,9 +29,11 @@ export default function AuthModal({ isOpen, onClose, mode }: AuthModalProps) {
       if (error) {
         setError(error.message)
       } else {
+        // Success - close modal and reset form
         onClose()
         setEmail('')
         setPassword('')
+        setError('')
       }
     } catch (err) {
       setError('An unexpected error occurred')
@@ -68,7 +70,7 @@ export default function AuthModal({ isOpen, onClose, mode }: AuthModalProps) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 text-gray-900 bg-white"
             />
           </div>
 
@@ -82,7 +84,7 @@ export default function AuthModal({ isOpen, onClose, mode }: AuthModalProps) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 text-gray-900 bg-white"
             />
           </div>
 
@@ -95,7 +97,7 @@ export default function AuthModal({ isOpen, onClose, mode }: AuthModalProps) {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-orange-600 text-white py-2 px-4 rounded-md hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white py-2 px-4 rounded-md hover:from-emerald-700 hover:to-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
           >
             {loading ? 'Loading...' : (mode === 'signin' ? 'Sign In' : 'Sign Up')}
           </button>
@@ -111,7 +113,7 @@ export default function AuthModal({ isOpen, onClose, mode }: AuthModalProps) {
                 setEmail('')
                 setPassword('')
               }}
-              className="text-orange-600 hover:underline"
+              className="text-emerald-600 hover:text-teal-600 hover:underline transition-colors"
             >
               Sign in here
             </button>
