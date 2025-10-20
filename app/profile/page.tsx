@@ -38,6 +38,7 @@ export default function ProfilePage() {
     favoritesCount: 0,
     reviewsCount: 0
   })
+  const [avatarUpdateKey, setAvatarUpdateKey] = useState(0)
 
   const showToastNotification = (message: string, type: 'success' | 'error') => {
     setToastMessage(message)
@@ -165,8 +166,10 @@ export default function ProfilePage() {
         console.error('Update error:', updateError)
         showToastNotification('Error updating profile. Please try again.', 'error')
       } else {
+        // Update both profile state and form data
         setProfile(prev => prev ? { ...prev, avatar_url: publicUrl } : null)
         setFormData(prev => ({ ...prev, avatar_url: publicUrl }))
+        setAvatarUpdateKey(prev => prev + 1) // Force re-render
         showToastNotification('Avatar updated successfully!', 'success')
         setImagePreview(null)
       }
@@ -281,13 +284,14 @@ export default function ProfilePage() {
             {/* Profile Header */}
             <div className="bg-white rounded-2xl shadow-lg p-6 mb-6 border border-white/20">
               <div className="text-center">
-                <div className="relative inline-block mb-4">
+                <div className="relative inline-block mb-4" key={`avatar-${avatarUpdateKey}`}>
                   {profile?.avatar_url ? (
                     <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-purple-500 shadow-lg mx-auto">
                       <img 
-                        src={profile.avatar_url} 
+                        src={`${profile.avatar_url}?t=${Date.now()}`} 
                         alt="Profile Avatar" 
                         className="w-full h-full object-cover"
+                        key={`img-${avatarUpdateKey}`}
                       />
                     </div>
                   ) : (
@@ -477,7 +481,7 @@ export default function ProfilePage() {
                 />
               ) : (
                 <div className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl bg-gray-50 text-gray-700">
-                  {profile?.avatar_url ? 'Avatar uploaded' : 'No avatar uploaded'}
+                  {profile?.avatar_url || formData.avatar_url ? 'Avatar uploaded' : 'No avatar uploaded'}
                 </div>
               )}
             </div>
