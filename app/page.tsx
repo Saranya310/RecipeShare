@@ -94,12 +94,7 @@ export default function Home() {
                   </button>
                 </div>
               ) : (
-                <button
-                  onClick={handleSignIn}
-                  className="bg-gradient-to-r from-emerald-100 to-teal-100 hover:from-emerald-200 hover:to-teal-200 text-emerald-700 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 shadow-md hover:shadow-lg"
-                >
-                  Sign In
-                </button>
+                <div></div>
               )}
             </div>
           </div>
