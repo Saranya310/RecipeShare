@@ -24,7 +24,8 @@ export default function ProfilePage() {
   const [formData, setFormData] = useState({
     username: '',
     full_name: '',
-    bio: ''
+    bio: '',
+    avatar_url: ''
   })
   const [showToast, setShowToast] = useState(false)
   const [toastMessage, setToastMessage] = useState('')
@@ -54,7 +55,7 @@ export default function ProfilePage() {
         if (error) {
           if (error.code === 'PGRST116') {
             setProfile(null)
-            setFormData({ username: '', full_name: '', bio: '' })
+            setFormData({ username: '', full_name: '', bio: '', avatar_url: '' })
           } else {
             console.error('Error fetching profile:', error)
             setProfile(null)
@@ -64,7 +65,8 @@ export default function ProfilePage() {
           setFormData({
             username: data?.username || '',
             full_name: data?.full_name || '',
-            bio: data?.bio || ''
+            bio: data?.bio || '',
+            avatar_url: data?.avatar_url || ''
           })
         }
       } catch (error) {
@@ -118,7 +120,8 @@ export default function ProfilePage() {
           .update({
             username: formData.username.trim(),
             full_name: formData.full_name.trim(),
-            bio: formData.bio.trim()
+            bio: formData.bio.trim(),
+            avatar_url: formData.avatar_url.trim()
           })
           .eq('id', user.id)
       } else {
@@ -128,7 +131,8 @@ export default function ProfilePage() {
             id: user.id,
             username: formData.username.trim(),
             full_name: formData.full_name.trim(),
-            bio: formData.bio.trim()
+            bio: formData.bio.trim(),
+            avatar_url: formData.avatar_url.trim()
           })
       }
 
@@ -155,10 +159,11 @@ export default function ProfilePage() {
       setFormData({
         username: profile.username || '',
         full_name: profile.full_name || '',
-        bio: profile.bio || ''
+        bio: profile.bio || '',
+        avatar_url: profile.avatar_url || ''
       })
     } else {
-      setFormData({ username: '', full_name: '', bio: '' })
+      setFormData({ username: '', full_name: '', bio: '', avatar_url: '' })
     }
     setIsEditing(false)
   }
@@ -188,15 +193,27 @@ export default function ProfilePage() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
+          {/* Left Column - Profile Info */}
           <div className="lg:col-span-1">
+            {/* Profile Header */}
             <div className="bg-white rounded-2xl shadow-lg p-4 mb-4 border border-white/20">
               <div className="text-center">
                 <div className="relative inline-block mb-4">
-                  <div className="w-24 h-24 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-full flex items-center justify-center mx-auto shadow-lg">
-                    <span className="text-white text-3xl">
-                      {profile?.username?.charAt(0) || profile?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
-                    </span>
-                  </div>
+                  {profile?.avatar_url ? (
+                    <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-purple-500 shadow-lg mx-auto">
+                      <img
+                        src={profile.avatar_url}
+                        alt="Profile Avatar"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-24 h-24 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-full flex items-center justify-center mx-auto shadow-lg">
+                      <span className="text-white text-3xl">
+                        {profile?.username?.charAt(0) || profile?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
+                      </span>
+                    </div>
+                  )}
                 </div>
                 
                 <h2 className="text-2xl font-bold text-gray-900 mb-1">
@@ -208,8 +225,40 @@ export default function ProfilePage() {
                 </p>
               </div>
             </div>
+
+            {/* Profile Stats */}
+            <div className="bg-white rounded-2xl shadow-lg p-4 border border-white/20">
+              <h3 className="text-lg font-bold text-gray-900 mb-3">Profile Stats</h3>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Username</span>
+                  <span className="font-semibold text-gray-900">
+                    {profile?.username || 'Not set'}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Full Name</span>
+                  <span className="font-semibold text-gray-900">
+                    {profile?.full_name || 'Not set'}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Bio</span>
+                  <span className="font-semibold text-gray-900">
+                    {profile?.bio ? 'Set' : 'Not set'}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Avatar</span>
+                  <span className="font-semibold text-gray-900">
+                    {profile?.avatar_url ? 'Uploaded' : 'Not uploaded'}
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
 
+          {/* Right Column - Profile Form */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-2xl shadow-lg p-6 border border-white/20">
               <div className="mb-4">
@@ -279,6 +328,24 @@ export default function ProfilePage() {
                 )}
               </div>
 
+              <div className="mt-4">
+                <label className="block text-base font-bold mb-1">Avatar URL</label>
+                {isEditing ? (
+                  <input
+                    type="url"
+                    name="avatar_url"
+                    value={formData.avatar_url}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-300 bg-white text-gray-900"
+                    placeholder="Enter image URL"
+                  />
+                ) : (
+                  <div className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl bg-gray-50 text-gray-700">
+                    {profile?.avatar_url ? 'Avatar set' : 'No avatar set'}
+                  </div>
+                )}
+              </div>
+
               <div className="mt-6 text-center">
                 {isEditing ? (
                   <div className="flex justify-center space-x-4">
@@ -309,6 +376,7 @@ export default function ProfilePage() {
         </div>
       </div>
 
+      {/* Toast Notifications */}
       {showToast && (
         <div className="fixed top-4 right-4 z-50">
           <div className={`px-6 py-4 rounded-xl shadow-lg border-l-4 ${
