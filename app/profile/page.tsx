@@ -69,20 +69,9 @@ export default function ProfilePage() {
             })
           }
 
-          // Fetch profile stats
-          const [recipesResult, favoritesResult, reviewsResult] = await Promise.all([
-            supabase.from('recipes').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
-            supabase.from('recipe_favorites').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
-            supabase.from('recipe_ratings').select('*', { count: 'exact', head: true }).eq('user_id', user.id)
-          ])
-
-          setProfileStats({
-            recipesCount: recipesResult.count || 0,
-            favoritesCount: favoritesResult.count || 0,
-            reviewsCount: reviewsResult.count || 0
-          })
         } catch (error) {
           console.error('Unexpected error:', error)
+          setProfile(null)
         } finally {
           setLoading(false)
         }
@@ -91,12 +80,20 @@ export default function ProfilePage() {
       }
     }
 
-    fetchProfile()
+    try {
+      fetchProfile()
+    } catch (error) {
+      console.error('Error in fetchProfile:', error)
+      setLoading(false)
+    }
   }, [user])
 
 
   const handleSave = async () => {
-    if (!user) return
+    if (!user) {
+      console.error('No user found')
+      return
+    }
 
     // Validation
     if (!formData.username.trim()) {
