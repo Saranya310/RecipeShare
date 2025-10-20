@@ -179,19 +179,19 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-50 flex items-center justify-center">
+      <div className="h-screen bg-gradient-to-br from-emerald-50 to-teal-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
-            <span className="text-white text-2xl">👤</span>
+          <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-full flex items-center justify-center mx-auto mb-3 animate-pulse">
+            <span className="text-white text-lg">👤</span>
           </div>
-          <p className="text-lg text-gray-700">Loading profile...</p>
+          <p className="text-sm text-gray-700">Loading profile...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-50">
+    <div className="h-screen bg-gradient-to-br from-emerald-50 to-teal-50 flex flex-col">
       <RecipeNavigation 
         title="My Profile" 
         subtitle="Manage your account information and preferences"
@@ -199,158 +199,138 @@ export default function ProfilePage() {
         backButtonPath="/dashboard"
       />
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-2xl shadow-lg p-8 border border-white/20">
-          <div className="text-center mb-8">
-            <div className="relative inline-block mb-4">
-              <div className="w-24 h-24 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-full flex items-center justify-center mx-auto shadow-lg">
-                <span className="text-white text-3xl">
-                  {profile?.username?.charAt(0) || profile?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
-                </span>
-              </div>
-            </div>
-            
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              {profile?.full_name || profile?.username || user?.email?.split('@')[0] || 'User'}
-            </h1>
-            <p className="text-gray-600 mb-2">@{profile?.username || user?.email?.split('@')[0] || 'username'}</p>
-            <p className="text-sm text-gray-500">
-              {profile?.created_at ? `Member since ${new Date(profile.created_at).toLocaleDateString()}` : 'New member'}
-            </p>
-          </div>
-
-          <div className="max-w-2xl mx-auto">
-            <div className="space-y-6">
-              {/* Username Field */}
-              <div>
-                <label className="block text-lg font-bold text-gray-800 mb-2">
-                  Username <span className="text-red-500">*</span>
-                </label>
-                {isEditing ? (
-                  <div>
-                    <input
-                      type="text"
-                      name="username"
-                      value={formData.username}
-                      onChange={handleChange}
-                      maxLength={50}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-300 bg-white text-gray-900"
-                      placeholder="Enter username (3-50 characters)"
-                      required
-                    />
-                    <p className="text-xs text-gray-500 mt-1">
-                      {formData.username.length}/50 characters
-                    </p>
-                  </div>
-                ) : (
-                  <div className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl bg-gray-50 text-gray-700">
-                    {profile?.username || 'No username set'}
-                  </div>
-                )}
-              </div>
-
-              {/* Full Name Field */}
-              <div>
-                <label className="block text-lg font-bold text-gray-800 mb-2">Full Name</label>
-                {isEditing ? (
-                  <div>
-                    <input
-                      type="text"
-                      name="full_name"
-                      value={formData.full_name}
-                      onChange={handleChange}
-                      maxLength={100}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-300 bg-white text-gray-900"
-                      placeholder="Enter full name (optional)"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">
-                      {formData.full_name.length}/100 characters
-                    </p>
-                  </div>
-                ) : (
-                  <div className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl bg-gray-50 text-gray-700">
-                    {profile?.full_name || 'No full name set'}
-                  </div>
-                )}
-              </div>
-
-              {/* Bio Field */}
-              <div>
-                <label className="block text-lg font-bold text-gray-800 mb-2">Bio</label>
-                {isEditing ? (
-                  <div>
-                    <textarea
-                      name="bio"
-                      value={formData.bio}
-                      onChange={handleChange}
-                      rows={4}
-                      maxLength={500}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-300 bg-white text-gray-900 resize-none"
-                      placeholder="Tell us about yourself... (optional)"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">
-                      {formData.bio.length}/500 characters
-                    </p>
-                  </div>
-                ) : (
-                  <div className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl bg-gray-50 text-gray-700 min-h-[100px]">
-                    {profile?.bio || 'No bio set'}
-                  </div>
-                )}
-              </div>
-
-              {/* Profile Stats */}
-              <div className="bg-gray-50 rounded-xl p-4">
-                <h3 className="text-lg font-bold text-gray-900 mb-3">Profile Information</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">User ID:</span>
-                    <span className="font-mono text-gray-900 text-xs">{user?.id?.slice(0, 8)}...</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Email:</span>
-                    <span className="text-gray-900">{user?.email}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Profile Created:</span>
-                    <span className="text-gray-900">
-                      {profile?.created_at ? new Date(profile.created_at).toLocaleDateString() : 'Not created'}
+      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-4">
+        <div className="w-full max-w-4xl">
+          <div className="bg-white rounded-2xl shadow-lg p-6 border border-white/20">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              
+              {/* Left Column - Profile Header */}
+              <div className="lg:col-span-1">
+                <div className="text-center">
+                  <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                    <span className="text-white text-2xl">
+                      {profile?.username?.charAt(0) || profile?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
                     </span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Last Updated:</span>
-                    <span className="text-gray-900">
-                      {profile?.updated_at ? new Date(profile.updated_at).toLocaleDateString() : 'Never'}
-                    </span>
-                  </div>
+                  
+                  <h1 className="text-xl font-bold text-gray-900 mb-1">
+                    {profile?.full_name || profile?.username || user?.email?.split('@')[0] || 'User'}
+                  </h1>
+                  <p className="text-sm text-gray-600 mb-1">@{profile?.username || user?.email?.split('@')[0] || 'username'}</p>
+                  <p className="text-xs text-gray-500">
+                    {profile?.created_at ? `Member since ${new Date(profile.created_at).toLocaleDateString()}` : 'New member'}
+                  </p>
                 </div>
               </div>
 
-              {/* Action Buttons */}
-              <div className="text-center pt-6">
-                {isEditing ? (
-                  <div className="flex justify-center space-x-4">
-                    <button
-                      onClick={handleSave}
-                      className="bg-purple-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-purple-700 transition-colors shadow-lg"
-                    >
-                      Save Changes
-                    </button>
-                    <button
-                      onClick={handleCancel}
-                      className="border-2 border-purple-600 text-purple-600 px-8 py-3 rounded-xl font-semibold hover:bg-purple-600 hover:text-white transition-colors"
-                    >
-                      Cancel
-                    </button>
+              {/* Right Column - Profile Form */}
+              <div className="lg:col-span-2">
+                <div className="space-y-4">
+                  {/* Username Field */}
+                  <div>
+                    <label className="block text-sm font-bold text-gray-800 mb-1">
+                      Username <span className="text-red-500">*</span>
+                    </label>
+                    {isEditing ? (
+                      <div>
+                        <input
+                          type="text"
+                          name="username"
+                          value={formData.username}
+                          onChange={handleChange}
+                          maxLength={50}
+                          className="w-full px-3 py-2 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-300 bg-white text-gray-900"
+                          placeholder="Enter username (3-50 characters)"
+                          required
+                        />
+                        <p className="text-xs text-gray-500 mt-1">
+                          {formData.username.length}/50 characters
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="w-full px-3 py-2 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-700">
+                        {profile?.username || 'No username set'}
+                      </div>
+                    )}
                   </div>
-                ) : (
-                  <button
-                    onClick={() => setIsEditing(true)}
-                    className="bg-purple-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-purple-700 transition-colors shadow-lg"
-                  >
-                    Edit Profile
-                  </button>
-                )}
+
+                  {/* Full Name Field */}
+                  <div>
+                    <label className="block text-sm font-bold text-gray-800 mb-1">Full Name</label>
+                    {isEditing ? (
+                      <div>
+                        <input
+                          type="text"
+                          name="full_name"
+                          value={formData.full_name}
+                          onChange={handleChange}
+                          maxLength={100}
+                          className="w-full px-3 py-2 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-300 bg-white text-gray-900"
+                          placeholder="Enter full name (optional)"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">
+                          {formData.full_name.length}/100 characters
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="w-full px-3 py-2 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-700">
+                        {profile?.full_name || 'No full name set'}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Bio Field */}
+                  <div>
+                    <label className="block text-sm font-bold text-gray-800 mb-1">Bio</label>
+                    {isEditing ? (
+                      <div>
+                        <textarea
+                          name="bio"
+                          value={formData.bio}
+                          onChange={handleChange}
+                          rows={3}
+                          maxLength={500}
+                          className="w-full px-3 py-2 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-300 bg-white text-gray-900 resize-none"
+                          placeholder="Tell us about yourself... (optional)"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">
+                          {formData.bio.length}/500 characters
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="w-full px-3 py-2 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-700 min-h-[80px]">
+                        {profile?.bio || 'No bio set'}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="pt-2">
+                    {isEditing ? (
+                      <div className="flex space-x-3">
+                        <button
+                          onClick={handleSave}
+                          className="bg-purple-600 text-white px-6 py-2 rounded-xl font-semibold hover:bg-purple-700 transition-colors shadow-lg text-sm"
+                        >
+                          Save Changes
+                        </button>
+                        <button
+                          onClick={handleCancel}
+                          className="border-2 border-purple-600 text-purple-600 px-6 py-2 rounded-xl font-semibold hover:bg-purple-600 hover:text-white transition-colors text-sm"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setIsEditing(true)}
+                        className="bg-purple-600 text-white px-6 py-2 rounded-xl font-semibold hover:bg-purple-700 transition-colors shadow-lg text-sm"
+                      >
+                        Edit Profile
+                      </button>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -360,7 +340,7 @@ export default function ProfilePage() {
       {/* Toast Notifications */}
       {showToast && (
         <div className="fixed top-4 right-4 z-50">
-          <div className={`px-6 py-4 rounded-xl shadow-lg border-l-4 ${
+          <div className={`px-4 py-3 rounded-xl shadow-lg border-l-4 ${
             toastType === 'success' 
               ? 'bg-green-50 border-green-500 text-green-800' 
               : 'bg-red-50 border-red-500 text-red-800'
@@ -368,13 +348,13 @@ export default function ProfilePage() {
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 {toastType === 'success' ? (
-                  <span className="text-green-500 text-xl">✅</span>
+                  <span className="text-green-500 text-lg">✅</span>
                 ) : (
-                  <span className="text-red-500 text-xl">❌</span>
+                  <span className="text-red-500 text-lg">❌</span>
                 )}
               </div>
-              <div className="ml-3">
-                <p className="text-sm font-medium">{toastMessage}</p>
+              <div className="ml-2">
+                <p className="text-xs font-medium">{toastMessage}</p>
               </div>
             </div>
           </div>
