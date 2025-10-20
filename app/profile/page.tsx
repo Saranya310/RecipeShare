@@ -29,6 +29,22 @@ export default function ProfilePage() {
     bio: '',
     avatar_url: ''
   })
+  const [showToast, setShowToast] = useState(false)
+  const [toastMessage, setToastMessage] = useState('')
+  const [toastType, setToastType] = useState<'success' | 'error'>('success')
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [profileStats, setProfileStats] = useState({
+    recipesCount: 0,
+    favoritesCount: 0,
+    reviewsCount: 0
+  })
+
+  const showToastNotification = (message: string, type: 'success' | 'error') => {
+    setToastMessage(message)
+    setToastType(type)
+    setShowToast(true)
+    setTimeout(() => setShowToast(false), 3000)
+  }
 
   useEffect(() => {
     async function fetchProfile() {
@@ -51,6 +67,19 @@ export default function ProfilePage() {
               avatar_url: data?.avatar_url || ''
             })
           }
+
+          // Fetch profile stats
+          const [recipesResult, favoritesResult, reviewsResult] = await Promise.all([
+            supabase.from('recipes').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
+            supabase.from('recipe_favorites').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
+            supabase.from('recipe_ratings').select('*', { count: 'exact', head: true }).eq('user_id', user.id)
+          ])
+
+          setProfileStats({
+            recipesCount: recipesResult.count || 0,
+            favoritesCount: favoritesResult.count || 0,
+            reviewsCount: reviewsResult.count || 0
+          })
         } catch (error) {
           console.error('Unexpected error:', error)
         } finally {
@@ -83,29 +112,46 @@ export default function ProfilePage() {
 
         if (updateError) {
           console.error('Update error:', updateError)
-          alert('Error updating profile. Please try again.')
+          showToastNotification('Error uploading avatar. Please try again.', 'error')
         } else {
           setProfile(prev => prev ? { ...prev, avatar_url: base64String } : null)
-          alert('Avatar updated successfully!')
+          setFormData(prev => ({ ...prev, avatar_url: base64String }))
+          showToastNotification('Avatar updated successfully!', 'success')
         }
         setUploading(false)
       }
       
       reader.onerror = () => {
-        alert('Error reading file. Please try again.')
+        showToastNotification('Error reading file. Please try again.', 'error')
         setUploading(false)
       }
       
       reader.readAsDataURL(file)
     } catch (error) {
       console.error('Unexpected error:', error)
-      alert('Error uploading avatar. Please try again.')
+      showToastNotification('Error uploading avatar. Please try again.', 'error')
       setUploading(false)
     }
   }
 
   const handleSave = async () => {
     if (!user) return
+
+    // Validation
+    if (!formData.username.trim()) {
+      showToastNotification('Username is required', 'error')
+      return
+    }
+
+    if (formData.username.length < 3) {
+      showToastNotification('Username must be at least 3 characters', 'error')
+      return
+    }
+
+    if (formData.bio && formData.bio.length > 500) {
+      showToastNotification('Bio must be less than 500 characters', 'error')
+      return
+    }
 
     try {
       const { error } = await supabase
@@ -120,15 +166,15 @@ export default function ProfilePage() {
 
       if (error) {
         console.error('Error updating profile:', error)
-        alert('Error updating profile. Please try again.')
+        showToastNotification('Error updating profile. Please try again.', 'error')
       } else {
         setProfile(prev => prev ? { ...prev, ...formData } : null)
         setIsEditing(false)
-        alert('Profile updated successfully!')
+        showToastNotification('Profile updated successfully!', 'success')
       }
     } catch (error) {
       console.error('Unexpected error:', error)
-      alert('Error updating profile. Please try again.')
+      showToastNotification('Error updating profile. Please try again.', 'error')
     }
   }
 
@@ -166,6 +212,24 @@ export default function ProfilePage() {
           <p className="text-base text-gray-600 max-w-2xl mx-auto mb-8">
             Manage your account information and preferences
           </p>
+        </div>
+      </div>
+
+      {/* Profile Stats Section */}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-6 text-center border border-emerald-200">
+            <div className="text-3xl font-bold text-emerald-600 mb-2">{profileStats.recipesCount}</div>
+            <div className="text-sm text-gray-600">Recipes Created</div>
+          </div>
+          <div className="bg-gradient-to-br from-pink-50 to-rose-50 rounded-2xl p-6 text-center border border-pink-200">
+            <div className="text-3xl font-bold text-pink-600 mb-2">{profileStats.favoritesCount}</div>
+            <div className="text-sm text-gray-600">Favorites Saved</div>
+          </div>
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 text-center border border-blue-200">
+            <div className="text-3xl font-bold text-blue-600 mb-2">{profileStats.reviewsCount}</div>
+            <div className="text-sm text-gray-600">Reviews Written</div>
+          </div>
         </div>
       </div>
 
@@ -208,6 +272,23 @@ export default function ProfilePage() {
                 className="hidden"
               />
             </div>
+            
+            {/* Image Preview */}
+            {imagePreview && (
+              <div className="mt-4 p-4 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">
+                <div className="text-center">
+                  <div className="text-sm text-gray-600 mb-2">Preview:</div>
+                  <img 
+                    src={imagePreview} 
+                    alt="Preview" 
+                    className="w-32 h-32 object-cover rounded-lg mx-auto"
+                  />
+                  <div className="text-xs text-gray-500 mt-2">
+                    Click save to confirm this image
+                  </div>
+                </div>
+              </div>
+            )}
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
               {profile?.full_name || profile?.username || 'User'}
             </h2>
@@ -254,14 +335,29 @@ export default function ProfilePage() {
               </div>
             </div>
             <div className="md:col-span-2">
-              <label className="block text-lg font-bold text-gray-800 mb-2">Bio</label>
+              <label className="block text-lg font-bold text-gray-800 mb-2">
+                Bio
+                {isEditing && (
+                  <span className="text-sm text-gray-500 ml-2">
+                    ({formData.bio.length}/500 characters)
+                  </span>
+                )}
+              </label>
               {isEditing ? (
-                <textarea
-                  value={formData.bio}
-                  onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
-                  className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-300 bg-white text-gray-900 min-h-[100px]"
-                  placeholder="Tell us about yourself..."
-                />
+                <div>
+                  <textarea
+                    value={formData.bio}
+                    onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
+                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-300 bg-white text-gray-900 min-h-[100px]"
+                    placeholder="Tell us about yourself..."
+                    maxLength={500}
+                  />
+                  <div className="text-right text-sm text-gray-500 mt-1">
+                    {formData.bio.length > 450 && (
+                      <span className="text-orange-600">Approaching character limit</span>
+                    )}
+                  </div>
+                </div>
               ) : (
                 <div className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl bg-gray-50 text-gray-700 min-h-[100px]">
                   {profile?.bio || 'No bio available'}
@@ -329,6 +425,30 @@ export default function ProfilePage() {
           Back to Dashboard
         </a>
       </div>
+
+      {/* Toast Notifications */}
+      {showToast && (
+        <div className="fixed top-4 right-4 z-50">
+          <div className={`px-6 py-4 rounded-xl shadow-lg border-l-4 ${
+            toastType === 'success' 
+              ? 'bg-green-50 border-green-500 text-green-800' 
+              : 'bg-red-50 border-red-500 text-red-800'
+          }`}>
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                {toastType === 'success' ? (
+                  <span className="text-green-500 text-xl">✅</span>
+                ) : (
+                  <span className="text-red-500 text-xl">❌</span>
+                )}
+              </div>
+              <div className="ml-3">
+                <p className="text-sm font-medium">{toastMessage}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
