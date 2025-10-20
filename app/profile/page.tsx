@@ -472,6 +472,7 @@ export default function ProfilePage() {
                 Edit Profile
               </button>
             )}
+            </div>
           </div>
         </div>
       </div>
@@ -509,6 +510,7 @@ export default function ProfilePage() {
           </div>
         </div>
       )}
+    </div>
     </div>
   )
 }
