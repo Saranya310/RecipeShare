@@ -206,13 +206,13 @@ export default function Dashboard() {
 
       {/* Dashboard Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Hero Section */}
-        <div className="relative overflow-hidden bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-600 rounded-3xl p-8 md:p-12 mb-12 text-white">
+        {/* Simplified Hero Section */}
+        <div className="relative overflow-hidden bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-600 rounded-3xl p-6 md:p-8 mb-8 text-white">
           <div className="absolute inset-0 bg-black/10"></div>
           <div className="relative z-10">
             <div className="flex items-center space-x-3 mb-4">
               {profile?.avatar_url ? (
-                <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/30">
+                <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white/30">
                   <img 
                     src={profile.avatar_url} 
                     alt="Profile Avatar" 
@@ -220,34 +220,46 @@ export default function Dashboard() {
                   />
                 </div>
               ) : (
-                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-                  <span className="text-2xl">👋</span>
+                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                  <span className="text-xl">👋</span>
                 </div>
               )}
               <div>
-                <h1 className="text-3xl md:text-4xl font-bold">
+                <h1 className="text-2xl md:text-3xl font-bold">
                   Welcome back, {profile?.username || profile?.full_name || user?.email?.split('@')[0]}!
                 </h1>
-                <p className="text-emerald-100 text-lg">
+                <p className="text-emerald-100">
                   Ready to cook something amazing today?
                 </p>
               </div>
             </div>
-            <div className="mt-8 flex flex-wrap gap-4">
-              <div className="bg-white/20 backdrop-blur-sm rounded-xl px-4 py-2">
-                <span className="text-sm font-medium">🍳 Recipe Creator</span>
-              </div>
-              <div className="bg-white/20 backdrop-blur-sm rounded-xl px-4 py-2">
-                <span className="text-sm font-medium">⭐ Community Member</span>
-              </div>
-              <div className="bg-white/20 backdrop-blur-sm rounded-xl px-4 py-2">
-                <span className="text-sm font-medium">❤️ Food Lover</span>
-              </div>
-            </div>
           </div>
           {/* Decorative elements */}
-          <div className="absolute top-4 right-4 w-32 h-32 bg-white/10 rounded-full blur-xl"></div>
-          <div className="absolute bottom-4 left-4 w-24 h-24 bg-white/10 rounded-full blur-lg"></div>
+          <div className="absolute top-4 right-4 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
+          <div className="absolute bottom-4 left-4 w-16 h-16 bg-white/10 rounded-full blur-lg"></div>
+        </div>
+
+        {/* Quick Stats Summary */}
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 mb-8 shadow-lg border border-white/20">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Your Quick Stats</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-emerald-600">{userRecipes.length}</div>
+              <div className="text-sm text-gray-600">Recipes Created</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-pink-600">{favoritesCount}</div>
+              <div className="text-sm text-gray-600">Favorites Saved</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-yellow-600">{reviewsCount}</div>
+              <div className="text-sm text-gray-600">Reviews Received</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-blue-600">{myReviewsCount}</div>
+              <div className="text-sm text-gray-600">Reviews Written</div>
+            </div>
+          </div>
         </div>
 
         {/* Enhanced Dashboard Stats */}
@@ -352,6 +364,126 @@ export default function Dashboard() {
                   </div>
                   <h3 className="font-bold text-gray-900 mb-2 group-hover:text-blue-700 transition-colors">My Reviews</h3>
                   <p className="text-sm text-gray-600 group-hover:text-blue-600 transition-colors">Reviews you've written</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Recent Activity Section */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Recent Activity</h2>
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20">
+            {userRecipes.length > 0 ? (
+              <div className="space-y-4">
+                <h3 className="font-semibold text-gray-800 mb-4">Your Latest Recipes</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {userRecipes.slice(0, 3).map((recipe) => (
+                    <div key={recipe.id} className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl p-4 border border-emerald-200">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-lg flex items-center justify-center">
+                          <span className="text-white text-sm">🍳</span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-semibold text-gray-900 truncate">{recipe.title}</h4>
+                          <p className="text-sm text-gray-600">
+                            {new Date(recipe.created_at).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {userRecipes.length > 3 && (
+                  <div className="text-center mt-4">
+                    <button 
+                      onClick={() => router.push('/my-recipes')}
+                      className="text-emerald-600 hover:text-emerald-700 font-medium text-sm"
+                    >
+                      View all {userRecipes.length} recipes →
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <div className="w-16 h-16 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl">🍳</span>
+                </div>
+                <h3 className="font-semibold text-gray-800 mb-2">No recipes yet</h3>
+                <p className="text-gray-600 mb-4">Start your culinary journey by creating your first recipe!</p>
+                <button 
+                  onClick={() => router.push('/create-recipe')}
+                  className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-6 py-2 rounded-lg font-medium hover:from-emerald-700 hover:to-teal-700 transition-all duration-300"
+                >
+                  Create Your First Recipe
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Personalized Tips */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Personalized Tips</h2>
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 shadow-lg border border-blue-200">
+            <div className="flex items-start space-x-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                <span className="text-white text-xl">💡</span>
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-2">Smart Suggestions</h3>
+                <div className="space-y-2 text-sm text-gray-700">
+                  {userRecipes.length === 0 && (
+                    <p>• Start by creating your first recipe to build your culinary portfolio</p>
+                  )}
+                  {userRecipes.length > 0 && favoritesCount === 0 && (
+                    <p>• Explore recipes from other cooks and save your favorites for inspiration</p>
+                  )}
+                  {userRecipes.length > 0 && myReviewsCount === 0 && (
+                    <p>• Share your thoughts on recipes you've tried - the community loves feedback!</p>
+                  )}
+                  {userRecipes.length > 0 && favoritesCount > 0 && myReviewsCount > 0 && (
+                    <p>• You're doing great! Consider adding photos to your recipes to make them more appealing</p>
+                  )}
+                  <p>• Join the community by rating and reviewing recipes you've tried</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Community Highlights */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Community Highlights</h2>
+          <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 shadow-lg border border-purple-200">
+            <div className="flex items-start space-x-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                <span className="text-white text-xl">🌟</span>
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-gray-900 mb-2">Join the Community</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                  <div className="bg-white/60 rounded-lg p-3">
+                    <div className="font-medium text-gray-800">👥 Active Cooks</div>
+                    <div className="text-gray-600">Join 1,000+ home cooks</div>
+                  </div>
+                  <div className="bg-white/60 rounded-lg p-3">
+                    <div className="font-medium text-gray-800">🍽️ Recipe Collection</div>
+                    <div className="text-gray-600">500+ shared recipes</div>
+                  </div>
+                  <div className="bg-white/60 rounded-lg p-3">
+                    <div className="font-medium text-gray-800">⭐ Community Reviews</div>
+                    <div className="text-gray-600">2,000+ helpful reviews</div>
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <button 
+                    onClick={() => router.push('/recipes')}
+                    className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-2 rounded-lg font-medium hover:from-purple-700 hover:to-pink-700 transition-all duration-300 text-sm"
+                  >
+                    Explore Community Recipes
+                  </button>
                 </div>
               </div>
             </div>
