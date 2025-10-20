@@ -12,6 +12,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true)
   const [favoritesCount, setFavoritesCount] = useState(0)
   const [reviewsCount, setReviewsCount] = useState(0)
+  const [myReviewsCount, setMyReviewsCount] = useState(0)
   const [profile, setProfile] = useState<any>(null)
 
   // Fetch user's recipes and favorites count
@@ -20,58 +21,77 @@ export default function Dashboard() {
       if (user) {
         setLoading(true)
         
-        // Fetch user's recipes
-        const { data: recipesData, error: recipesError } = await supabase
-          .from('recipes')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false })
-          .limit(6) // Show latest 6 recipes
+        try {
+          // Fetch user's recipes
+          const { data: recipesData, error: recipesError } = await supabase
+            .from('recipes')
+            .select('*')
+            .eq('user_id', user.id)
 
-        if (recipesError) {
-          console.error('Error fetching user recipes:', recipesError)
-        } else {
-          setUserRecipes(recipesData || [])
-        }
+          if (recipesError) {
+            console.error('Error fetching user recipes:', recipesError)
+            setUserRecipes([])
+          } else {
+            setUserRecipes(recipesData || [])
+          }
 
-        // Fetch favorites count
-        const { count: favoritesCount, error: favoritesError } = await supabase
-          .from('recipe_favorites')
+          // Fetch favorites count
+          const { count: favoritesCount, error: favoritesError } = await supabase
+            .from('recipe_favorites')
+            .select('*', { count: 'exact', head: true })
+            .eq('user_id', user.id)
+
+          if (favoritesError) {
+            console.error('Error fetching favorites count:', favoritesError)
+            setFavoritesCount(0)
+          } else {
+            setFavoritesCount(favoritesCount || 0)
+          }
+
+        // Fetch reviews received count (reviews on user's recipes)
+        const { count: reviewsReceivedCount, error: reviewsReceivedError } = await supabase
+          .from('recipe_ratings')
           .select('*', { count: 'exact', head: true })
-          .eq('user_id', user.id)
+          .in('recipe_id', userRecipes.map(r => r.id))
 
-        if (favoritesError) {
-          console.error('Error fetching favorites count:', favoritesError)
+        if (reviewsReceivedError) {
+          console.error('Error fetching reviews received count:', reviewsReceivedError)
+          setReviewsCount(0)
         } else {
-          setFavoritesCount(favoritesCount || 0)
+          setReviewsCount(reviewsReceivedCount || 0)
         }
 
-        // Fetch reviews count
-        const { count: reviewsCount, error: reviewsError } = await supabase
+        // Fetch reviews written count (reviews written by user)
+        const { count: myReviewsCount, error: myReviewsError } = await supabase
           .from('recipe_ratings')
           .select('*', { count: 'exact', head: true })
           .eq('user_id', user.id)
 
-        if (reviewsError) {
-          console.error('Error fetching reviews count:', reviewsError)
+        if (myReviewsError) {
+          console.error('Error fetching my reviews count:', myReviewsError)
+          setMyReviewsCount(0)
         } else {
-          setReviewsCount(reviewsCount || 0)
+          setMyReviewsCount(myReviewsCount || 0)
         }
 
-        // Fetch user profile
-        const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single()
+          // Fetch user profile
+          const { data: profileData, error: profileError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
+            .single()
 
-        if (profileError) {
-          console.error('Error fetching profile:', profileError)
-        } else {
-          setProfile(profileData)
+          if (profileError) {
+            console.error('Error fetching profile:', profileError)
+            setProfile(null)
+          } else {
+            setProfile(profileData)
+          }
+        } catch (error) {
+          console.error('Unexpected error:', error)
+        } finally {
+          setLoading(false)
         }
-        
-        setLoading(false)
       }
     }
 
@@ -125,19 +145,33 @@ export default function Dashboard() {
   }, [user])
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-50">
-      {/* Navigation */}
-      <nav className="bg-white shadow-sm border-b">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 relative overflow-hidden">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-emerald-400/20 to-teal-400/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-teal-400/20 to-cyan-400/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-emerald-300/10 to-teal-300/10 rounded-full blur-3xl animate-pulse delay-500"></div>
+      </div>
+
+      {/* Enhanced Navigation */}
+      <nav className="relative bg-white/80 backdrop-blur-md shadow-lg border-b border-white/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+          <div className="flex justify-between items-center h-20">
             <div className="flex items-center">
-                     <h1 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">🍳 RecipeShare</h1>
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center shadow-lg">
+                  <span className="text-white text-xl">🍳</span>
+                </div>
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 bg-clip-text text-transparent">
+                  RecipeShare
+                </h1>
+              </div>
             </div>
             <div className="flex items-center space-x-4">
-              {/* User Avatar */}
+              {/* Enhanced User Avatar */}
               <div className="flex items-center space-x-3">
                 {profile?.avatar_url ? (
-                  <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-emerald-500">
+                  <div className="w-10 h-10 rounded-full overflow-hidden border-3 border-emerald-500 shadow-lg">
                     <img 
                       src={profile.avatar_url} 
                       alt="Profile Avatar" 
@@ -145,12 +179,12 @@ export default function Dashboard() {
                     />
                   </div>
                 ) : (
-                  <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                  <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
                     {profile?.username?.charAt(0) || profile?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
                   </div>
                 )}
-                <span className="text-gray-700 font-medium">
-                  {profile?.username || profile?.full_name || user?.email?.split('@')[0]}
+                <span className="text-gray-700 font-semibold text-lg">
+                  Welcome, {profile?.username || profile?.full_name || user?.email?.split('@')[0]}
                 </span>
               </div>
               <button
@@ -265,9 +299,9 @@ export default function Dashboard() {
                     </div>
                     <div className="text-right">
                       <div className="text-4xl font-bold text-yellow-700 mb-1 group-hover:text-yellow-800 transition-colors">
-                        Reviews
+                        {loading ? '...' : reviewsCount}
                       </div>
-                      <div className="text-sm font-semibold text-yellow-600">Received</div>
+                      <div className="text-sm font-semibold text-yellow-600">Reviews</div>
                     </div>
                   </div>
                   <h3 className="font-bold text-gray-900 mb-2 group-hover:text-yellow-700 transition-colors">Recipe Reviews</h3>
@@ -311,7 +345,7 @@ export default function Dashboard() {
                     </div>
                     <div className="text-right">
                       <div className="text-4xl font-bold text-blue-700 mb-1 group-hover:text-blue-800 transition-colors">
-                        {loading ? '...' : reviewsCount}
+                        {loading ? '...' : myReviewsCount}
                       </div>
                       <div className="text-sm font-semibold text-blue-600">Reviews</div>
                     </div>
@@ -354,7 +388,7 @@ export default function Dashboard() {
               </p>
               <button 
                 onClick={() => router.push('/recipes')}
-                className="w-full border-2 border-blue-600 text-blue-600 px-6 py-3 rounded-xl font-semibold hover:bg-blue-600 hover:text-white transition-all duration-300"
+                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
               >
                 Browse Recipes
               </button>
