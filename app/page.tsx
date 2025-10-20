@@ -60,7 +60,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 relative overflow-hidden">
+    <div className="h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 relative overflow-hidden">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-emerald-400/20 to-teal-400/20 rounded-full blur-3xl animate-pulse"></div>
@@ -108,7 +108,7 @@ export default function Home() {
 
 
       {/* Enhanced Hero Section */}
-      <main className="relative flex items-center justify-center h-screen py-4">
+      <main className="relative flex items-center justify-center h-screen py-2">
         {/* Floating Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-to-br from-emerald-400/30 to-teal-400/30 rounded-full blur-2xl animate-pulse"></div>
@@ -119,8 +119,8 @@ export default function Home() {
 
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           {/* Hero Icon */}
-          <div className="mb-4">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl shadow-2xl mb-4">
+          <div className="mb-3">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl shadow-2xl mb-3">
               <span className="text-2xl">🍳</span>
             </div>
             <div className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-full flex items-center justify-center animate-bounce">
@@ -129,7 +129,7 @@ export default function Home() {
           </div>
 
           {/* Hero Title */}
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4 leading-tight">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3 leading-tight">
             Share Your
             <span className="block bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 bg-clip-text text-transparent">
               Favorite Recipes
@@ -137,13 +137,13 @@ export default function Home() {
           </h1>
 
           {/* Hero Description */}
-          <p className="text-sm text-gray-600 mb-5 max-w-lg mx-auto leading-relaxed">
+          <p className="text-sm text-gray-600 mb-4 max-w-lg mx-auto leading-relaxed">
             Discover amazing recipes from home cooks around the world. Upload your own creations, 
             inspire others with your culinary skills, and build a community of passionate food lovers.
           </p>
 
           {/* Feature Pills */}
-          <div className="flex flex-wrap justify-center gap-3 mb-5">
+          <div className="flex flex-wrap justify-center gap-3 mb-4">
             <div className="bg-white/80 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg border border-white/20">
               <span className="text-sm font-semibold text-gray-700">🍽️ Easy to Share</span>
             </div>
@@ -159,7 +159,7 @@ export default function Home() {
           </div>
 
           {/* Social Proof */}
-          <div className="flex items-center justify-center mb-5">
+          <div className="flex items-center justify-center mb-4">
             <div className="flex -space-x-2">
               <div className="w-8 h-8 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-full border-2 border-white flex items-center justify-center text-white text-sm font-semibold shadow-lg">👨‍🍳</div>
               <div className="w-8 h-8 bg-gradient-to-r from-teal-400 to-cyan-400 rounded-full border-2 border-white flex items-center justify-center text-white text-sm font-semibold shadow-lg">👩‍🍳</div>
@@ -170,7 +170,7 @@ export default function Home() {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <button 
               onClick={handleSignUp}
               className="group relative bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 text-white px-8 py-3 rounded-xl text-base font-bold hover:from-emerald-700 hover:via-teal-700 hover:to-cyan-700 transition-all duration-500 shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 hover:scale-105 active:scale-95 overflow-hidden"
