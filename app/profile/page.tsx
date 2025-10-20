@@ -57,7 +57,20 @@ export default function ProfilePage() {
             .single()
 
           if (error) {
-            console.error('Error fetching profile:', error)
+            if (error.code === 'PGRST116') {
+              // Profile doesn't exist, create a default one
+              console.log('No profile found, will create one when user saves')
+              setProfile(null)
+              setFormData({
+                username: '',
+                full_name: '',
+                bio: '',
+                avatar_url: ''
+              })
+            } else {
+              console.error('Error fetching profile:', error)
+              setProfile(null)
+            }
           } else {
             setProfile(data)
             setFormData({
@@ -185,27 +198,55 @@ export default function ProfilePage() {
     }
 
     try {
-      const { error } = await supabase
+      // First, check if profile exists
+      const { data: existingProfile, error: fetchError } = await supabase
         .from('profiles')
-        .update({
-          username: formData.username,
-          full_name: formData.full_name,
-          bio: formData.bio,
-          avatar_url: formData.avatar_url
-        })
+        .select('id')
         .eq('id', user.id)
+        .single()
 
-      if (error) {
-        console.error('Error updating profile:', error)
-        showToastNotification('Error updating profile. Please try again.', 'error')
+      if (fetchError && fetchError.code !== 'PGRST116') {
+        console.error('Error checking profile:', fetchError)
+        showToastNotification('Error checking profile. Please try again.', 'error')
+        return
+      }
+
+      let result
+      if (existingProfile) {
+        // Profile exists, update it
+        result = await supabase
+          .from('profiles')
+          .update({
+            username: formData.username.trim(),
+            full_name: formData.full_name.trim(),
+            bio: formData.bio.trim(),
+            avatar_url: formData.avatar_url.trim()
+          })
+          .eq('id', user.id)
+      } else {
+        // Profile doesn't exist, create it
+        result = await supabase
+          .from('profiles')
+          .insert({
+            id: user.id,
+            username: formData.username.trim(),
+            full_name: formData.full_name.trim(),
+            bio: formData.bio.trim(),
+            avatar_url: formData.avatar_url.trim()
+          })
+      }
+
+      if (result.error) {
+        console.error('Error saving profile:', result.error)
+        showToastNotification('Error saving profile. Please try again.', 'error')
       } else {
         setProfile(prev => prev ? { ...prev, ...formData } : null)
         setIsEditing(false)
-        showToastNotification('Profile updated successfully!', 'success')
+        showToastNotification('Profile saved successfully!', 'success')
       }
     } catch (error) {
       console.error('Unexpected error:', error)
-      showToastNotification('Error updating profile. Please try again.', 'error')
+      showToastNotification('Error saving profile. Please try again.', 'error')
     }
   }
 
@@ -277,11 +318,11 @@ export default function ProfilePage() {
                 </div>
                 
                 <h2 className="text-2xl font-bold text-gray-900 mb-1">
-                  {profile?.full_name || profile?.username || 'User'}
+                  {profile?.full_name || profile?.username || user?.email?.split('@')[0] || 'User'}
                 </h2>
-                <p className="text-gray-600 mb-2">@{profile?.username || 'username'}</p>
+                <p className="text-gray-600 mb-2">@{profile?.username || user?.email?.split('@')[0] || 'username'}</p>
                 <p className="text-sm text-gray-500">
-                  Member since {profile?.created_at ? new Date(profile.created_at).toLocaleDateString() : 'Recently'}
+                  {profile?.created_at ? `Member since ${new Date(profile.created_at).toLocaleDateString()}` : 'New member'}
                 </p>
               </div>
             </div>
