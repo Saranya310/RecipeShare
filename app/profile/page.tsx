@@ -147,7 +147,12 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-50">
-      <RecipeNavigation />
+      <RecipeNavigation 
+        title="My Profile" 
+        subtitle="Manage your account information and preferences"
+        backButtonText="← Back to Dashboard"
+        backButtonPath="/dashboard"
+      />
 
       {/* Hero Section */}
       <div className="py-16 px-4 sm:px-6 lg:px-8">

@@ -12,8 +12,9 @@ interface Recipe {
   title: string
   description: string | null
   prep_time: number | null
+  cook_time: number | null
   servings: number | null
-  difficulty: string | null
+  difficulty: 'Easy' | 'Medium' | 'Hard' | null
   image_url: string | null
   created_at: string
   user_id: string
@@ -68,7 +69,12 @@ export default function MyRecipesPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-50">
-      <RecipeNavigation />
+      <RecipeNavigation 
+        title="My Recipes" 
+        subtitle="Manage and share your culinary creations"
+        backButtonText="← Back to Dashboard"
+        backButtonPath="/dashboard"
+      />
 
       {/* Hero Section */}
       <div className="py-16 px-4 sm:px-6 lg:px-8">

@@ -160,7 +160,7 @@ export default function RecipeRating({ recipeId, recipeOwnerId }: RecipeRatingPr
   const calculateAverageRating = () => {
     if (ratings.length === 0) return 0
     const sum = ratings.reduce((acc, rating) => acc + rating.rating, 0)
-    return (sum / ratings.length).toFixed(1)
+    return Number((sum / ratings.length).toFixed(1))
   }
 
   const renderStars = (rating: number, interactive: boolean = false, size: 'sm' | 'md' | 'lg' = 'md') => {
@@ -231,7 +231,7 @@ export default function RecipeRating({ recipeId, recipeOwnerId }: RecipeRatingPr
         
         <div className="flex items-center space-x-8 mb-8">
           <div className="flex items-center space-x-2">
-            {renderStars(parseFloat(averageRating), false, 'lg')}
+            {renderStars(averageRating, false, 'lg')}
           </div>
           <div className="flex-1">
             <p className="text-lg font-semibold text-gray-800">
