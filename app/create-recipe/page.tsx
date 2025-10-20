@@ -156,16 +156,16 @@ export default function CreateRecipe() {
         backButtonPath="/dashboard"
       />
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="bg-white rounded-xl shadow-lg p-6 border border-white/20">
           <div className="text-center mb-6">
-            <h1 className="text-2xl font-bold text-gray-900 mb-1">
+            <h1 className="text-xl font-bold text-gray-900 mb-1">
               Create Your <span className="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 bg-clip-text text-transparent">Recipe</span>
             </h1>
             <p className="text-sm text-gray-600">Share your culinary creativity with the community</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-5">
             {/* Basic Information */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -215,53 +215,53 @@ export default function CreateRecipe() {
             </div>
 
             {/* Recipe Details */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Prep Time (min)</label>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">Prep Time (min)</label>
                 <input
                   type="number"
                   name="prep_time"
                   value={formData.prep_time}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300 bg-white text-gray-900"
+                  className="w-full px-2 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300 bg-white text-gray-900 text-sm"
                   placeholder="15"
                   min="0"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Cook Time (min)</label>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">Cook Time (min)</label>
                 <input
                   type="number"
                   name="cook_time"
                   value={formData.cook_time}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300 bg-white text-gray-900"
+                  className="w-full px-2 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300 bg-white text-gray-900 text-sm"
                   placeholder="30"
                   min="0"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Servings</label>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">Servings</label>
                 <input
                   type="number"
                   name="servings"
                   value={formData.servings}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300 bg-white text-gray-900"
+                  className="w-full px-2 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300 bg-white text-gray-900 text-sm"
                   placeholder="4"
                   min="1"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Difficulty</label>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">Difficulty</label>
                 <select
                   name="difficulty"
                   value={formData.difficulty}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300 bg-white text-gray-900"
+                  className="w-full px-2 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300 bg-white text-gray-900 text-sm"
                 >
                   <option value="Easy">Easy</option>
                   <option value="Medium">Medium</option>
@@ -273,82 +273,87 @@ export default function CreateRecipe() {
             {/* Ingredients */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">Ingredients</label>
-              {formData.ingredients.map((ingredient, index) => (
-                <div key={index} className="flex items-center space-x-2 mb-2">
-                  <input
-                    type="text"
-                    value={ingredient}
-                    onChange={(e) => handleArrayInputChange('ingredients', index, e.target.value)}
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300 bg-white text-gray-900"
-                    placeholder={`Ingredient ${index + 1}`}
-                    required={index === 0}
-                  />
-                  {formData.ingredients.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => removeArrayItem('ingredients', index)}
-                      className="text-red-500 hover:text-red-700 p-1 rounded hover:bg-red-50 transition-colors"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </button>
-                  )}
-                </div>
-              ))}
-              <button
-                type="button"
-                onClick={() => addArrayItem('ingredients')}
-                className="text-emerald-600 hover:text-emerald-800 flex items-center space-x-1 text-sm font-medium"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                <span>Add Ingredient</span>
-              </button>
+              <div className="space-y-2">
+                {formData.ingredients.map((ingredient, index) => (
+                  <div key={index} className="flex items-center space-x-2">
+                    <span className="text-gray-500 text-sm w-6">{index + 1}.</span>
+                    <input
+                      type="text"
+                      value={ingredient}
+                      onChange={(e) => handleArrayInputChange('ingredients', index, e.target.value)}
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300 bg-white text-gray-900"
+                      placeholder={`Ingredient ${index + 1}`}
+                      required={index === 0}
+                    />
+                    {formData.ingredients.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeArrayItem('ingredients', index)}
+                        className="text-red-500 hover:text-red-700 p-1 rounded hover:bg-red-50 transition-colors"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => addArrayItem('ingredients')}
+                  className="text-emerald-600 hover:text-emerald-800 flex items-center space-x-1 text-sm font-medium"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  <span>Add Ingredient</span>
+                </button>
+              </div>
             </div>
 
             {/* Instructions */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">Instructions</label>
-              {formData.instructions.map((instruction, index) => (
-                <div key={index} className="flex items-start space-x-2 mb-2">
-                  <div className="flex-shrink-0 w-6 h-6 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center font-bold text-xs mt-1">
-                    {index + 1}
+              <div className="space-y-2">
+                {formData.instructions.map((instruction, index) => (
+                  <div key={index} className="flex items-start space-x-2">
+                    <div className="flex-shrink-0 w-6 h-6 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center font-bold text-xs mt-1">
+                      {index + 1}
+                    </div>
+                    <div className="flex-1">
+                      <textarea
+                        value={instruction}
+                        onChange={(e) => handleArrayInputChange('instructions', index, e.target.value)}
+                        rows={2}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300 bg-white text-gray-900 resize-none"
+                        placeholder={`Step ${index + 1}`}
+                        required={index === 0}
+                      />
+                    </div>
+                    {formData.instructions.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeArrayItem('instructions', index)}
+                        className="text-red-500 hover:text-red-700 p-1 rounded hover:bg-red-50 transition-colors mt-1"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    )}
                   </div>
-                  <div className="flex-1">
-                    <textarea
-                      value={instruction}
-                      onChange={(e) => handleArrayInputChange('instructions', index, e.target.value)}
-                      rows={2}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300 bg-white text-gray-900 resize-none"
-                      placeholder={`Step ${index + 1}`}
-                      required={index === 0}
-                    />
-                  </div>
-                  {formData.instructions.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => removeArrayItem('instructions', index)}
-                      className="text-red-500 hover:text-red-700 p-1 rounded hover:bg-red-50 transition-colors mt-1"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </button>
-                  )}
-                </div>
-              ))}
-              <button
-                type="button"
-                onClick={() => addArrayItem('instructions')}
-                className="text-emerald-600 hover:text-emerald-800 flex items-center space-x-1 text-sm font-medium"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                <span>Add Step</span>
-              </button>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => addArrayItem('instructions')}
+                  className="text-emerald-600 hover:text-emerald-800 flex items-center space-x-1 text-sm font-medium"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  <span>Add Step</span>
+                </button>
+              </div>
             </div>
 
             {/* Submit Button */}
