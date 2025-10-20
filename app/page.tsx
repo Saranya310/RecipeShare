@@ -60,12 +60,12 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 relative overflow-hidden">
-      {/* Animated Background Elements */}
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50 relative overflow-hidden">
+      {/* Cooking-themed Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-emerald-400/20 to-teal-400/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-teal-400/20 to-cyan-400/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-emerald-300/10 to-teal-300/10 rounded-full blur-3xl animate-pulse delay-500"></div>
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-orange-400/20 to-red-400/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-yellow-400/20 to-orange-400/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-orange-300/10 to-red-300/10 rounded-full blur-3xl animate-pulse delay-500"></div>
       </div>
 
       {/* Enhanced Navigation */}
@@ -74,10 +74,10 @@ export default function Home() {
           <div className="flex justify-between items-center h-20">
             <div className="flex items-center">
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center shadow-lg">
-                  <span className="text-white text-xl">🍳</span>
+                <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center shadow-lg">
+                  <span className="text-white text-xl">👨‍🍳</span>
                 </div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 bg-clip-text text-transparent">
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
                   RecipeShare
                 </h1>
               </div>
@@ -96,7 +96,7 @@ export default function Home() {
               ) : (
                 <button
                   onClick={handleSignIn}
-                  className="bg-gradient-to-r from-emerald-100 to-teal-100 hover:from-emerald-200 hover:to-teal-200 text-emerald-700 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 shadow-md hover:shadow-lg"
+                  className="bg-gradient-to-r from-orange-100 to-red-100 hover:from-orange-200 hover:to-red-200 text-orange-700 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 shadow-md hover:shadow-lg"
                 >
                   Sign In
                 </button>
@@ -120,96 +120,117 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Enhanced Hero Section */}
-      <main className="relative flex items-center justify-center min-h-screen py-20">
-        {/* Floating Background Elements */}
+      {/* Recipe-Focused Hero Section */}
+      <main className="relative min-h-screen py-16">
+        {/* Cooking-themed background elements */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-to-br from-emerald-400/30 to-teal-400/30 rounded-full blur-2xl animate-pulse"></div>
-          <div className="absolute top-40 right-20 w-24 h-24 bg-gradient-to-br from-teal-400/30 to-cyan-400/30 rounded-full blur-2xl animate-pulse delay-1000"></div>
-          <div className="absolute bottom-20 left-1/4 w-20 h-20 bg-gradient-to-br from-cyan-400/30 to-blue-400/30 rounded-full blur-2xl animate-pulse delay-500"></div>
-          <div className="absolute bottom-40 right-1/3 w-16 h-16 bg-gradient-to-br from-emerald-300/30 to-teal-300/30 rounded-full blur-2xl animate-pulse delay-1500"></div>
+          <div className="absolute top-20 left-10 w-24 h-24 bg-gradient-to-br from-orange-300/20 to-red-300/20 rounded-full blur-2xl animate-pulse"></div>
+          <div className="absolute top-40 right-20 w-20 h-20 bg-gradient-to-br from-yellow-300/20 to-orange-300/20 rounded-full blur-2xl animate-pulse delay-1000"></div>
+          <div className="absolute bottom-20 left-1/4 w-16 h-16 bg-gradient-to-br from-green-300/20 to-emerald-300/20 rounded-full blur-2xl animate-pulse delay-500"></div>
+          <div className="absolute bottom-40 right-1/3 w-12 h-12 bg-gradient-to-br from-purple-300/20 to-pink-300/20 rounded-full blur-2xl animate-pulse delay-1500"></div>
         </div>
-
-        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          {/* Hero Icon */}
-          <div className="mb-8">
-            <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-3xl shadow-2xl mb-6">
-              <span className="text-4xl">🍳</span>
+        
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Main Content */}
+          <div className="text-center mb-16">
+            <div className="mb-6">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl shadow-xl mb-4">
+                <span className="text-2xl">👨‍🍳</span>
+              </div>
             </div>
-            <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-full flex items-center justify-center animate-bounce">
-              <span className="text-white text-sm">✨</span>
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 leading-tight">
+              Welcome to <span className="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">RecipeShare</span>
+            </h1>
+            <p className="text-base text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed">
+              Discover, create, and share amazing recipes with a community of passionate home cooks. From family favorites to gourmet creations, find your next culinary adventure.
+            </p>
+          </div>
+
+          {/* Recipe Categories Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+            <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-orange-100 hover:shadow-xl transition-all duration-300">
+              <div className="text-2xl mb-2">🍝</div>
+              <div className="text-sm font-semibold text-gray-800">Pasta</div>
+              <div className="text-xs text-gray-500">45 recipes</div>
+            </div>
+            <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-yellow-100 hover:shadow-xl transition-all duration-300">
+              <div className="text-2xl mb-2">🍰</div>
+              <div className="text-sm font-semibold text-gray-800">Desserts</div>
+              <div className="text-xs text-gray-500">32 recipes</div>
+            </div>
+            <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-green-100 hover:shadow-xl transition-all duration-300">
+              <div className="text-2xl mb-2">🥗</div>
+              <div className="text-sm font-semibold text-gray-800">Salads</div>
+              <div className="text-xs text-gray-500">28 recipes</div>
+            </div>
+            <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-red-100 hover:shadow-xl transition-all duration-300">
+              <div className="text-2xl mb-2">🍖</div>
+              <div className="text-sm font-semibold text-gray-800">Meat</div>
+              <div className="text-xs text-gray-500">41 recipes</div>
             </div>
           </div>
 
-          {/* Hero Title */}
-          <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-8 leading-tight">
-            Share Your
-            <span className="block bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 bg-clip-text text-transparent">
-              Favorite Recipes
-            </span>
-          </h1>
-
-          {/* Hero Description */}
-          <p className="text-xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed">
-            Discover amazing recipes from home cooks around the world. Upload your own creations, 
-            inspire others with your culinary skills, and build a community of passionate food lovers.
-          </p>
-
-          {/* Feature Pills */}
-          <div className="flex flex-wrap justify-center gap-4 mb-12">
-            <div className="bg-white/80 backdrop-blur-sm rounded-full px-6 py-3 shadow-lg border border-white/20">
-              <span className="text-sm font-semibold text-gray-700">🍽️ Easy to Share</span>
+          {/* Featured Recipe Preview */}
+          <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20 mb-12">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold text-gray-900">Today's Featured Recipe</h2>
+              <span className="text-sm text-gray-500">⭐ 4.8</span>
             </div>
-            <div className="bg-white/80 backdrop-blur-sm rounded-full px-6 py-3 shadow-lg border border-white/20">
-              <span className="text-sm font-semibold text-gray-700">👥 Community Driven</span>
-            </div>
-            <div className="bg-white/80 backdrop-blur-sm rounded-full px-6 py-3 shadow-lg border border-white/20">
-              <span className="text-sm font-semibold text-gray-700">⭐ Rate & Review</span>
-            </div>
-            <div className="bg-white/80 backdrop-blur-sm rounded-full px-6 py-3 shadow-lg border border-white/20">
-              <span className="text-sm font-semibold text-gray-700">❤️ Save Favorites</span>
+            <div className="flex items-center space-x-4">
+              <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-red-400 rounded-xl flex items-center justify-center">
+                <span className="text-2xl">🍝</span>
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-gray-900">Grandma's Spaghetti Carbonara</h3>
+                <p className="text-sm text-gray-600">Classic Italian pasta with eggs, cheese, and pancetta</p>
+                <div className="flex items-center space-x-4 mt-2 text-xs text-gray-500">
+                  <span>⏱️ 25 min</span>
+                  <span>👥 4 servings</span>
+                  <span>👨‍🍳 by Maria</span>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Social Proof */}
-          <div className="flex items-center justify-center mb-12">
-            <div className="flex -space-x-3">
-              <div className="w-12 h-12 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-full border-4 border-white flex items-center justify-center text-white text-lg font-semibold shadow-lg">👨‍🍳</div>
-              <div className="w-12 h-12 bg-gradient-to-r from-teal-400 to-cyan-400 rounded-full border-4 border-white flex items-center justify-center text-white text-lg font-semibold shadow-lg">👩‍🍳</div>
-              <div className="w-12 h-12 bg-gradient-to-r from-cyan-400 to-blue-400 rounded-full border-4 border-white flex items-center justify-center text-white text-lg font-semibold shadow-lg">🧑‍🍳</div>
-              <div className="w-12 h-12 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full border-4 border-white flex items-center justify-center text-white text-lg font-semibold shadow-lg">👨‍🍳</div>
+          {/* Community Stats */}
+          <div className="grid grid-cols-3 gap-4 mb-12">
+            <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-4 text-center border border-orange-100">
+              <div className="text-2xl font-bold text-orange-600">500+</div>
+              <div className="text-xs text-gray-600">Recipes</div>
             </div>
-            <span className="ml-4 text-lg text-gray-600 font-medium">Join thousands of home cooks worldwide</span>
+            <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl p-4 text-center border border-yellow-100">
+              <div className="text-2xl font-bold text-yellow-600">1.2k+</div>
+              <div className="text-xs text-gray-600">Home Cooks</div>
+            </div>
+            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 text-center border border-green-100">
+              <div className="text-2xl font-bold text-green-600">4.8★</div>
+              <div className="text-xs text-gray-600">Rating</div>
+            </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <button 
               onClick={handleSignUp}
-              className="group relative bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 text-white px-10 py-5 rounded-2xl text-xl font-bold hover:from-emerald-700 hover:via-teal-700 hover:to-cyan-700 transition-all duration-500 shadow-2xl hover:shadow-3xl transform hover:-translate-y-2 hover:scale-105 active:scale-95 overflow-hidden"
+              className="w-full sm:w-auto bg-gradient-to-r from-orange-500 to-red-500 text-white px-8 py-3 rounded-xl font-semibold hover:from-orange-600 hover:to-red-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
             >
-              <span className="relative z-10 flex items-center">
-                Start Sharing
-                <span className="ml-3 text-2xl group-hover:animate-bounce">🚀</span>
+              <span className="flex items-center justify-center">
+                <span className="mr-2">👨‍🍳</span>
+                Start Cooking
               </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
             </button>
-            
             <button 
               onClick={handleSignIn}
-              className="group bg-white/80 backdrop-blur-sm text-gray-700 px-10 py-5 rounded-2xl text-xl font-bold hover:bg-white/90 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 border border-white/20"
+              className="w-full sm:w-auto bg-white/80 backdrop-blur-sm text-gray-700 px-8 py-3 rounded-xl font-semibold hover:bg-white/90 transition-all duration-300 shadow-lg hover:shadow-xl border border-gray-200"
             >
-              <span className="flex items-center">
+              <span className="flex items-center justify-center">
+                <span className="mr-2">🔑</span>
                 Sign In
-                <span className="ml-3 text-xl group-hover:animate-pulse">👋</span>
               </span>
             </button>
           </div>
-
-          {/* Additional Info */}
-          <p className="mt-8 text-sm text-gray-500">
-            Free to join • No credit card required • Start sharing in seconds
-          </p>
+          
+          <p className="mt-6 text-xs text-gray-500 text-center">Free to join • No credit card required • Start sharing in seconds</p>
         </div>
       </main>
 
