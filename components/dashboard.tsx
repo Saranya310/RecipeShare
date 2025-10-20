@@ -74,7 +74,8 @@ export default function Dashboard() {
           setMyReviewsCount(myReviewsCount || 0)
         }
 
-          // Fetch user profile
+        // Fetch user profile
+        try {
           const { data: profileData, error: profileError } = await supabase
             .from('profiles')
             .select('*')
@@ -87,6 +88,10 @@ export default function Dashboard() {
           } else {
             setProfile(profileData)
           }
+        } catch (profileFetchError) {
+          console.error('Unexpected error fetching profile:', profileFetchError)
+          setProfile(null)
+        }
         } catch (error) {
           console.error('Unexpected error:', error)
         } finally {
@@ -126,14 +131,22 @@ export default function Dashboard() {
           }
 
           // Refresh profile data
-          const { data: profileData, error: profileError } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', user!.id)
-            .single()
+          try {
+            const { data: profileData, error: profileError } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', user!.id)
+              .single()
 
-          if (!profileError) {
-            setProfile(profileData)
+            if (profileError) {
+              console.error('Error refreshing profile:', profileError)
+              setProfile(null)
+            } else {
+              setProfile(profileData)
+            }
+          } catch (profileRefreshError) {
+            console.error('Unexpected error refreshing profile:', profileRefreshError)
+            setProfile(null)
           }
         }
         refreshData()
@@ -184,7 +197,7 @@ export default function Dashboard() {
                   </div>
                 )}
                 <span className="text-gray-700 font-semibold text-lg">
-                  Welcome, {profile?.username || profile?.full_name || user?.email?.split('@')[0]}
+                  Welcome, {profile?.username || profile?.full_name || user?.email?.split('@')[0] || 'Chef'}
                 </span>
               </div>
               <button
@@ -226,7 +239,7 @@ export default function Dashboard() {
               )}
               <div>
                 <h1 className="text-2xl md:text-3xl font-bold">
-                  Welcome back, {profile?.username || profile?.full_name || user?.email?.split('@')[0]}!
+                  Welcome back, {profile?.username || profile?.full_name || user?.email?.split('@')[0] || 'Chef'}!
                 </h1>
                 <p className="text-emerald-100">
                   Ready to cook something amazing today?
