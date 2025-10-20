@@ -1,10 +1,9 @@
-'use client'
-
-import { useEffect, useState } from 'react'
+import Image from "next/image";
+import { useState, useEffect } from 'react'
 import { useAuth } from '@/lib/auth-context'
-import AuthModal from '@/components/auth-modal'
-import Dashboard from '@/components/dashboard'
 import { supabase } from '@/lib/supabase'
+import Dashboard from '@/components/dashboard'
+import AuthModal from '@/components/auth-modal'
 
 export default function Home() {
   const [authModalOpen, setAuthModalOpen] = useState(false)
