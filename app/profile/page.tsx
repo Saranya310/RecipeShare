@@ -39,63 +39,51 @@ export default function ProfilePage() {
 
   useEffect(() => {
     async function fetchProfile() {
-      if (user) {
-        try {
-          const { data, error } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', user.id)
-            .single()
+      if (!user) {
+        setLoading(false)
+        return
+      }
 
-          if (error) {
-            if (error.code === 'PGRST116') {
-              // Profile doesn't exist, create a default one
-              console.log('No profile found, will create one when user saves')
-              setProfile(null)
-              setFormData({
-                username: '',
-                full_name: '',
-                bio: ''
-              })
-            } else {
-              console.error('Error fetching profile:', error)
-              setProfile(null)
-            }
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single()
+
+        if (error) {
+          if (error.code === 'PGRST116') {
+            setProfile(null)
+            setFormData({ username: '', full_name: '', bio: '' })
           } else {
-            setProfile(data)
-            setFormData({
-              username: data?.username || '',
-              full_name: data?.full_name || '',
-              bio: data?.bio || ''
-            })
+            console.error('Error fetching profile:', error)
+            setProfile(null)
           }
-
-          // Profile stats functionality removed for simplicity
-        } catch (error) {
-          console.error('Unexpected error:', error)
-        } finally {
-          setLoading(false)
+        } else {
+          setProfile(data)
+          setFormData({
+            username: data?.username || '',
+            full_name: data?.full_name || '',
+            bio: data?.bio || ''
+          })
         }
-      } else {
+      } catch (error) {
+        console.error('Unexpected error:', error)
+        setProfile(null)
+      } finally {
         setLoading(false)
       }
     }
 
-    try {
-      fetchProfile()
-    } catch (error) {
-      console.error('Error in fetchProfile:', error)
-      setLoading(false)
-    }
+    fetchProfile()
   }, [user])
 
   const handleSave = async () => {
     if (!user) {
-      console.error('No user found')
+      showToastNotification('No user found', 'error')
       return
     }
 
-    // Validation
     if (!formData.username.trim()) {
       showToastNotification('Username is required', 'error')
       return
@@ -112,7 +100,6 @@ export default function ProfilePage() {
     }
 
     try {
-      // First, check if profile exists
       const { data: existingProfile, error: fetchError } = await supabase
         .from('profiles')
         .select('id')
@@ -120,14 +107,12 @@ export default function ProfilePage() {
         .single()
 
       if (fetchError && fetchError.code !== 'PGRST116') {
-        console.error('Error checking profile:', fetchError)
         showToastNotification('Error checking profile. Please try again.', 'error')
         return
       }
 
       let result
       if (existingProfile) {
-        // Profile exists, update it
         result = await supabase
           .from('profiles')
           .update({
@@ -137,7 +122,6 @@ export default function ProfilePage() {
           })
           .eq('id', user.id)
       } else {
-        // Profile doesn't exist, create it
         result = await supabase
           .from('profiles')
           .insert({
@@ -149,7 +133,6 @@ export default function ProfilePage() {
       }
 
       if (result.error) {
-        console.error('Error saving profile:', result.error)
         showToastNotification('Error saving profile. Please try again.', 'error')
       } else {
         setProfile(prev => prev ? { ...prev, ...formData } : null)
@@ -175,11 +158,7 @@ export default function ProfilePage() {
         bio: profile.bio || ''
       })
     } else {
-      setFormData({
-        username: '',
-        full_name: '',
-        bio: ''
-      })
+      setFormData({ username: '', full_name: '', bio: '' })
     }
     setIsEditing(false)
   }
@@ -206,13 +185,10 @@ export default function ProfilePage() {
         backButtonPath="/dashboard"
       />
 
-      {/* Main Content Container */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
-          {/* Left Column - Profile Info */}
           <div className="lg:col-span-1">
-            {/* Profile Header */}
             <div className="bg-white rounded-2xl shadow-lg p-4 mb-4 border border-white/20">
               <div className="text-center">
                 <div className="relative inline-block mb-4">
@@ -234,7 +210,6 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* Right Column - Profile Form */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-2xl shadow-lg p-6 border border-white/20">
               <div className="mb-4">
@@ -334,7 +309,6 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {/* Toast Notifications */}
       {showToast && (
         <div className="fixed top-4 right-4 z-50">
           <div className={`px-6 py-4 rounded-xl shadow-lg border-l-4 ${
