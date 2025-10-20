@@ -171,7 +171,7 @@ export default function Home() {
               className="group relative bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 text-white px-8 py-3 rounded-xl text-base font-bold hover:from-emerald-700 hover:via-teal-700 hover:to-cyan-700 transition-all duration-500 shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 hover:scale-105 active:scale-95 overflow-hidden"
             >
               <span className="relative z-10 flex items-center">
-                Start Sharing
+                Start your culinary journey
                 <span className="ml-2 text-lg group-hover:animate-bounce">🚀</span>
               </span>
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
