@@ -135,18 +135,7 @@ export default function AuthModal({ isOpen, onClose, mode }: AuthModalProps) {
           {mode === 'signup' && (
             <div className="mt-6 p-4 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl border border-emerald-200">
               <p className="text-sm text-gray-600 text-center">
-                Already have an account?{' '}
-                <button
-                  onClick={() => {
-                    // Switch to sign in mode
-                    setError('')
-                    setEmail('')
-                    setPassword('')
-                  }}
-                  className="text-emerald-600 hover:text-emerald-700 font-semibold transition-colors duration-300"
-                >
-                  Sign in
-                </button>
+                Already have an account? Sign in
               </p>
             </div>
           )}
