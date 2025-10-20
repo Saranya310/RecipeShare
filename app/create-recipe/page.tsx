@@ -166,30 +166,30 @@ export default function CreateRecipe() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Basic Information */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Recipe Title *</label>
-                <input
-                  type="text"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300 bg-white text-gray-900"
-                  placeholder="Enter recipe title"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Category</label>
-                <CategorySelector
-                  onCategorySelect={handleCategorySelect}
-                  selectedCategoryId={formData.category_id}
-                />
-              </div>
+            {/* Recipe Title */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">Recipe Title *</label>
+              <input
+                type="text"
+                name="title"
+                value={formData.title}
+                onChange={handleInputChange}
+                required
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300 bg-white text-gray-900"
+                placeholder="Enter recipe title"
+              />
             </div>
 
+            {/* Category Selection */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">Category</label>
+              <CategorySelector
+                onCategorySelect={handleCategorySelect}
+                selectedCategoryId={formData.category_id}
+              />
+            </div>
+
+            {/* Description */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">Description</label>
               <textarea
