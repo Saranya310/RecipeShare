@@ -12,11 +12,11 @@ interface Category {
 
 interface CategorySelectorProps {
   selectedCategoryId?: string | null
-  onCategoryChange: (categoryId: string | null) => void
+  onCategorySelect: (categoryId: string | null) => void
   disabled?: boolean
 }
 
-export default function CategorySelector({ selectedCategoryId, onCategoryChange, disabled }: CategorySelectorProps) {
+export default function CategorySelector({ selectedCategoryId, onCategorySelect, disabled }: CategorySelectorProps) {
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -67,7 +67,7 @@ export default function CategorySelector({ selectedCategoryId, onCategoryChange,
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
         {/* All Categories Option */}
         <button
-          onClick={() => onCategoryChange(null)}
+          onClick={() => onCategorySelect(null)}
           disabled={disabled}
           className={`
             p-4 rounded-xl border-2 transition-all duration-200 text-left
@@ -96,7 +96,7 @@ export default function CategorySelector({ selectedCategoryId, onCategoryChange,
           categories.map((category) => (
             <button
               key={category.id}
-              onClick={() => onCategoryChange(category.id)}
+              onClick={() => onCategorySelect(category.id)}
               disabled={disabled}
               className={`
                 p-4 rounded-xl border-2 transition-all duration-200 text-left
