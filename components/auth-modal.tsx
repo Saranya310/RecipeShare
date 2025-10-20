@@ -7,9 +7,10 @@ interface AuthModalProps {
   isOpen: boolean
   onClose: () => void
   mode: 'signin' | 'signup'
+  onModeChange?: (mode: 'signin' | 'signup') => void
 }
 
-export default function AuthModal({ isOpen, onClose, mode }: AuthModalProps) {
+export default function AuthModal({ isOpen, onClose, mode, onModeChange }: AuthModalProps) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -132,13 +133,41 @@ export default function AuthModal({ isOpen, onClose, mode }: AuthModalProps) {
             </button>
           </form>
 
-          {mode === 'signup' && (
-            <div className="mt-6 p-4 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl border border-emerald-200">
-              <p className="text-sm text-gray-600 text-center">
-                Already have an account? Sign in
-              </p>
-            </div>
-          )}
+          <div className="mt-6 p-4 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl border border-emerald-200">
+            <p className="text-sm text-gray-600 text-center">
+              {mode === 'signup' ? (
+                <>
+                  Already have an account?{' '}
+                  <button
+                    onClick={() => {
+                      onModeChange?.('signin')
+                      setError('')
+                      setEmail('')
+                      setPassword('')
+                    }}
+                    className="text-emerald-600 hover:text-emerald-700 font-semibold transition-colors duration-300 cursor-pointer"
+                  >
+                    Sign in
+                  </button>
+                </>
+              ) : (
+                <>
+                  Don't have an account?{' '}
+                  <button
+                    onClick={() => {
+                      onModeChange?.('signup')
+                      setError('')
+                      setEmail('')
+                      setPassword('')
+                    }}
+                    className="text-emerald-600 hover:text-emerald-700 font-semibold transition-colors duration-300 cursor-pointer"
+                  >
+                    Sign up
+                  </button>
+                </>
+              )}
+            </p>
+          </div>
         </div>
       </div>
     </div>
