@@ -97,36 +97,67 @@ export default function ProfilePage() {
     const file = event.target.files?.[0]
     if (!file || !user) return
 
+    // Validate file type and size
+    if (!file.type.startsWith('image/')) {
+      showToastNotification('Please select a valid image file', 'error')
+      return
+    }
+
+    if (file.size > 5 * 1024 * 1024) { // 5MB limit
+      showToastNotification('Image size must be less than 5MB', 'error')
+      return
+    }
+
+    // Show image preview
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const preview = e.target?.result as string
+      setImagePreview(preview)
+    }
+    reader.readAsDataURL(file)
+
     setUploading(true)
     try {
-      // Convert file to base64 for now (since storage bucket doesn't exist)
-      const reader = new FileReader()
-      reader.onload = async (e) => {
-        const base64String = e.target?.result as string
-        
-        // Update profile with base64 avatar URL
-        const { error: updateError } = await supabase
-          .from('profiles')
-          .update({ avatar_url: base64String })
-          .eq('id', user.id)
+      // Upload to Supabase Storage
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${user.id}-${Date.now()}.${fileExt}`
+      const filePath = `avatars/${fileName}`
 
-        if (updateError) {
-          console.error('Update error:', updateError)
-          showToastNotification('Error uploading avatar. Please try again.', 'error')
-        } else {
-          setProfile(prev => prev ? { ...prev, avatar_url: base64String } : null)
-          setFormData(prev => ({ ...prev, avatar_url: base64String }))
-          showToastNotification('Avatar updated successfully!', 'success')
-        }
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: true
+        })
+
+      if (uploadError) {
+        console.error('Upload error:', uploadError)
+        showToastNotification('Error uploading avatar. Please try again.', 'error')
         setUploading(false)
+        return
       }
-      
-      reader.onerror = () => {
-        showToastNotification('Error reading file. Please try again.', 'error')
-        setUploading(false)
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath)
+
+      // Update profile with public URL
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: publicUrl })
+        .eq('id', user.id)
+
+      if (updateError) {
+        console.error('Update error:', updateError)
+        showToastNotification('Error updating profile. Please try again.', 'error')
+      } else {
+        setProfile(prev => prev ? { ...prev, avatar_url: publicUrl } : null)
+        setFormData(prev => ({ ...prev, avatar_url: publicUrl }))
+        showToastNotification('Avatar updated successfully!', 'success')
+        setImagePreview(null)
       }
-      
-      reader.readAsDataURL(file)
+      setUploading(false)
     } catch (error) {
       console.error('Unexpected error:', error)
       showToastNotification('Error uploading avatar. Please try again.', 'error')
@@ -200,102 +231,131 @@ export default function ProfilePage() {
         backButtonPath="/dashboard"
       />
 
-      {/* Hero Section */}
-      <div className="py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto text-center">
-          <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl">
-            <span className="text-white text-2xl">👤</span>
-          </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-            My <span className="bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 bg-clip-text text-transparent">Profile</span>
-          </h1>
-          <p className="text-base text-gray-600 max-w-2xl mx-auto mb-8">
-            Manage your account information and preferences
-          </p>
-        </div>
-      </div>
-
-      {/* Profile Stats Section */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-6 text-center border border-emerald-200">
-            <div className="text-3xl font-bold text-emerald-600 mb-2">{profileStats.recipesCount}</div>
-            <div className="text-sm text-gray-600">Recipes Created</div>
-          </div>
-          <div className="bg-gradient-to-br from-pink-50 to-rose-50 rounded-2xl p-6 text-center border border-pink-200">
-            <div className="text-3xl font-bold text-pink-600 mb-2">{profileStats.favoritesCount}</div>
-            <div className="text-sm text-gray-600">Favorites Saved</div>
-          </div>
-          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 text-center border border-blue-200">
-            <div className="text-3xl font-bold text-blue-600 mb-2">{profileStats.reviewsCount}</div>
-            <div className="text-sm text-gray-600">Reviews Written</div>
-          </div>
-        </div>
-      </div>
-
-      {/* Profile Details Section */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
-        <div className="bg-white rounded-3xl shadow-2xl p-8 border border-white/20">
-          <div className="text-center mb-8">
-            <div className="relative inline-block">
-              {profile?.avatar_url ? (
-                <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-purple-500 shadow-lg mx-auto mb-4">
-                  <img 
-                    src={profile.avatar_url} 
-                    alt="Profile Avatar" 
-                    className="w-full h-full object-cover"
+      {/* Main Content Container */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          
+          {/* Left Column - Profile Info */}
+          <div className="lg:col-span-1">
+            {/* Profile Header */}
+            <div className="bg-white rounded-2xl shadow-lg p-6 mb-6 border border-white/20">
+              <div className="text-center">
+                <div className="relative inline-block mb-4">
+                  {profile?.avatar_url ? (
+                    <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-purple-500 shadow-lg mx-auto">
+                      <img 
+                        src={profile.avatar_url} 
+                        alt="Profile Avatar" 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-24 h-24 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-full flex items-center justify-center mx-auto shadow-lg">
+                      <span className="text-white text-3xl">
+                        {profile?.username?.charAt(0) || profile?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
+                      </span>
+                    </div>
+                  )}
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploading}
+                    className="absolute -bottom-2 -right-2 w-8 h-8 bg-purple-600 text-white rounded-full flex items-center justify-center hover:bg-purple-700 transition-colors shadow-lg"
+                  >
+                    {uploading ? (
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    ) : (
+                      '📷'
+                    )}
+                  </button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarUpload}
+                    className="hidden"
                   />
                 </div>
-              ) : (
-                <div className="w-24 h-24 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-                  <span className="text-white text-3xl">
-                    {profile?.username?.charAt(0) || profile?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
-                  </span>
-                </div>
-              )}
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                disabled={uploading}
-                className="absolute -bottom-2 -right-2 w-8 h-8 bg-purple-600 text-white rounded-full flex items-center justify-center hover:bg-purple-700 transition-colors shadow-lg"
-              >
-                {uploading ? (
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                ) : (
-                  '📷'
-                )}
-              </button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleAvatarUpload}
-                className="hidden"
-              />
+                
+                <h2 className="text-2xl font-bold text-gray-900 mb-1">
+                  {profile?.full_name || profile?.username || 'User'}
+                </h2>
+                <p className="text-gray-600 mb-2">@{profile?.username || 'username'}</p>
+                <p className="text-sm text-gray-500">
+                  Member since {profile?.created_at ? new Date(profile.created_at).toLocaleDateString() : 'Recently'}
+                </p>
+              </div>
             </div>
-            
-            {/* Image Preview */}
-            {imagePreview && (
-              <div className="mt-4 p-4 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">
-                <div className="text-center">
-                  <div className="text-sm text-gray-600 mb-2">Preview:</div>
-                  <img 
-                    src={imagePreview} 
-                    alt="Preview" 
-                    className="w-32 h-32 object-cover rounded-lg mx-auto"
-                  />
-                  <div className="text-xs text-gray-500 mt-2">
-                    Click save to confirm this image
+
+            {/* Profile Stats */}
+            <div className="bg-white rounded-2xl shadow-lg p-6 border border-white/20">
+              <h3 className="text-lg font-bold text-gray-900 mb-4">Your Activity</h3>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-lg flex items-center justify-center">
+                      <span className="text-white text-sm">📝</span>
+                    </div>
+                    <div>
+                      <div className="font-semibold text-gray-900">Recipes</div>
+                      <div className="text-sm text-gray-600">Created</div>
+                    </div>
                   </div>
+                  <div className="text-2xl font-bold text-emerald-600">{profileStats.recipesCount}</div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-rose-500 rounded-lg flex items-center justify-center">
+                      <span className="text-white text-sm">❤️</span>
+                    </div>
+                    <div>
+                      <div className="font-semibold text-gray-900">Favorites</div>
+                      <div className="text-sm text-gray-600">Saved</div>
+                    </div>
+                  </div>
+                  <div className="text-2xl font-bold text-pink-600">{profileStats.favoritesCount}</div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-lg flex items-center justify-center">
+                      <span className="text-white text-sm">⭐</span>
+                    </div>
+                    <div>
+                      <div className="font-semibold text-gray-900">Reviews</div>
+                      <div className="text-sm text-gray-600">Written</div>
+                    </div>
+                  </div>
+                  <div className="text-2xl font-bold text-blue-600">{profileStats.reviewsCount}</div>
                 </div>
               </div>
-            )}
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              {profile?.full_name || profile?.username || 'User'}
-            </h2>
-            <p className="text-gray-600">@{profile?.username || 'username'}</p>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Right Column - Profile Form */}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-2xl shadow-lg p-8 border border-white/20">
+              <div className="mb-6">
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">Profile Information</h3>
+                <p className="text-gray-600">Update your personal details and preferences</p>
+              </div>
+
+              {/* Image Preview */}
+              {imagePreview && (
+                <div className="mb-6 p-4 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">
+                  <div className="text-center">
+                    <div className="text-sm text-gray-600 mb-2">Preview:</div>
+                    <img 
+                      src={imagePreview} 
+                      alt="Preview" 
+                      className="w-32 h-32 object-cover rounded-lg mx-auto"
+                    />
+                    <div className="text-xs text-gray-500 mt-2">
+                      Click save to confirm this image
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-lg font-bold text-gray-800 mb-2">Username</label>
               {isEditing ? (
@@ -307,9 +367,9 @@ export default function ProfilePage() {
                   placeholder="Enter username"
                 />
               ) : (
-                <div className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl bg-gray-50 text-gray-700">
-                  {profile?.username || 'Not set'}
-                </div>
+              <div className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl bg-gray-50 text-gray-700">
+                {profile?.username || 'No username set'}
+              </div>
               )}
             </div>
             <div>
@@ -323,15 +383,15 @@ export default function ProfilePage() {
                   placeholder="Enter full name"
                 />
               ) : (
-                <div className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl bg-gray-50 text-gray-700">
-                  {profile?.full_name || 'Not set'}
-                </div>
+              <div className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl bg-gray-50 text-gray-700">
+                {profile?.full_name || 'No full name set'}
+              </div>
               )}
             </div>
             <div className="md:col-span-2">
               <label className="block text-lg font-bold text-gray-800 mb-2">Email</label>
               <div className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl bg-gray-50 text-gray-700">
-                {user?.email || 'Not available'}
+                {user?.email || 'No email available'}
               </div>
             </div>
             <div className="md:col-span-2">
@@ -360,7 +420,7 @@ export default function ProfilePage() {
                 </div>
               ) : (
                 <div className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl bg-gray-50 text-gray-700 min-h-[100px]">
-                  {profile?.bio || 'No bio available'}
+                  {profile?.bio || 'No bio written yet'}
                 </div>
               )}
             </div>
@@ -376,14 +436,14 @@ export default function ProfilePage() {
                 />
               ) : (
                 <div className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl bg-gray-50 text-gray-700">
-                  {profile?.avatar_url ? 'Avatar set' : 'No avatar set'}
+                  {profile?.avatar_url ? 'Avatar uploaded' : 'No avatar uploaded'}
                 </div>
               )}
             </div>
             <div className="md:col-span-2">
               <label className="block text-lg font-bold text-gray-800 mb-2">Member Since</label>
               <div className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl bg-gray-50 text-gray-700">
-                {profile?.created_at ? new Date(profile.created_at).toLocaleDateString() : 'Unknown'}
+                {profile?.created_at ? new Date(profile.created_at).toLocaleDateString() : 'Recently joined'}
               </div>
             </div>
           </div>
