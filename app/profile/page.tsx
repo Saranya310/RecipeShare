@@ -332,15 +332,6 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {/* Back to Dashboard */}
-      <div className="text-center pb-16">
-        <a
-          href="/dashboard"
-          className="border-2 border-emerald-600 text-emerald-600 px-6 py-3 rounded-xl font-semibold hover:bg-emerald-600 hover:text-white transition-colors inline-block"
-        >
-          Back to Dashboard
-        </a>
-      </div>
 
       {/* Toast Notifications */}
       {showToast && (
