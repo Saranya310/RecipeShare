@@ -11,6 +11,7 @@ interface Profile {
   username: string | null
   full_name: string | null
   bio: string | null
+  avatar_url: string | null
   created_at: string
 }
 
@@ -69,9 +70,9 @@ export default function ProfilePage() {
             })
           }
 
+          // Profile stats functionality removed for simplicity
         } catch (error) {
           console.error('Unexpected error:', error)
-          setProfile(null)
         } finally {
           setLoading(false)
         }
@@ -80,19 +81,12 @@ export default function ProfilePage() {
       }
     }
 
-    try {
-      fetchProfile()
-    } catch (error) {
-      console.error('Error in fetchProfile:', error)
-      setLoading(false)
-    }
+    fetchProfile()
   }, [user])
 
+
   const handleSave = async () => {
-    if (!user) {
-      console.error('No user found')
-      return
-    }
+    if (!user) return
 
     // Validation
     if (!formData.username.trim()) {
@@ -161,33 +155,11 @@ export default function ProfilePage() {
     }
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
-  }
-
-  const handleCancel = () => {
-    if (profile) {
-      setFormData({
-        username: profile.username || '',
-        full_name: profile.full_name || '',
-        bio: profile.bio || ''
-      })
-    } else {
-      setFormData({
-        username: '',
-        full_name: '',
-        bio: ''
-      })
-    }
-    setIsEditing(false)
-  }
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+          <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-pulse">
             <span className="text-white text-2xl">👤</span>
           </div>
           <p className="text-lg text-gray-700">Loading profile...</p>
@@ -231,6 +203,7 @@ export default function ProfilePage() {
                 </p>
               </div>
             </div>
+
           </div>
 
           {/* Right Column - Profile Form */}
@@ -241,96 +214,121 @@ export default function ProfilePage() {
                 <p className="text-sm text-gray-600">Update your personal details and preferences</p>
               </div>
 
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-base font-bold mb-1">Username *</label>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      name="username"
-                      value={formData.username}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-300 bg-white text-gray-900"
-                      placeholder="Enter username"
-                    />
-                  ) : (
-                    <div className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl bg-gray-50 text-gray-700">
-                      {profile?.username || 'No username set'}
-                    </div>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-base font-bold mb-1">Full Name</label>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      name="full_name"
-                      value={formData.full_name}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-300 bg-white text-gray-900"
-                      placeholder="Enter full name"
-                    />
-                  ) : (
-                    <div className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl bg-gray-50 text-gray-700">
-                      {profile?.full_name || 'No full name set'}
-                    </div>
-                  )}
-                </div>
+            <div>
+              <label className="block text-base font-bold text-gray-800 mb-1">Username</label>
+              {isEditing ? (
+                <input
+                  type="text"
+                  value={formData.username}
+                  onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-300 bg-white text-gray-900"
+                  placeholder="Enter username"
+                />
+              ) : (
+                <div className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-700">
+                {profile?.username || 'No username set'}
               </div>
-
-              <div className="mt-4">
-                <label className="block text-base font-bold mb-1">Bio</label>
-                {isEditing ? (
-                  <textarea
-                    name="bio"
-                    value={formData.bio}
-                    onChange={handleChange}
-                    rows={4}
-                    maxLength={500}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-300 bg-white text-gray-900 resize-none"
-                    placeholder="Tell us about yourself..."
-                  />
-                ) : (
-                  <div className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl bg-gray-50 text-gray-700 min-h-[100px]">
-                    {profile?.bio || 'No bio set'}
-                  </div>
-                )}
+              )}
+            </div>
+            <div>
+              <label className="block text-base font-bold text-gray-800 mb-1">Full Name</label>
+              {isEditing ? (
+                <input
+                  type="text"
+                  value={formData.full_name}
+                  onChange={(e) => setFormData(prev => ({ ...prev, full_name: e.target.value }))}
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-300 bg-white text-gray-900"
+                  placeholder="Enter full name"
+                />
+              ) : (
+                <div className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-700">
+                {profile?.full_name || 'No full name set'}
+              </div>
+              )}
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-base font-bold text-gray-800 mb-1">Email</label>
+                <div className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-700">
+                {user?.email || 'No email available'}
+              </div>
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-base font-bold text-gray-800 mb-1">
+                Bio
                 {isEditing && (
-                  <p className="text-xs text-gray-500 mt-1">
-                    {formData.bio.length}/500 characters
-                  </p>
+                  <span className="text-sm text-gray-500 ml-2">
+                    ({formData.bio.length}/500 characters)
+                  </span>
                 )}
-              </div>
-
-              <div className="mt-6 text-center">
-                {isEditing ? (
-                  <div className="flex justify-center space-x-4">
-                    <button
-                      onClick={handleSave}
-                      className="bg-purple-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-purple-700 transition-colors shadow-lg"
-                    >
-                      Save Changes
-                    </button>
-                    <button
-                      onClick={handleCancel}
-                      className="border-2 border-purple-600 text-purple-600 px-6 py-3 rounded-xl font-semibold hover:bg-purple-600 hover:text-white transition-colors"
-                    >
-                      Cancel
-                    </button>
+              </label>
+              {isEditing ? (
+                <div>
+                  <textarea
+                    value={formData.bio}
+                    onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
+                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-300 bg-white text-gray-900 min-h-[100px]"
+                    placeholder="Tell us about yourself..."
+                    maxLength={500}
+                  />
+                  <div className="text-right text-sm text-gray-500 mt-1">
+                    {formData.bio.length > 450 && (
+                      <span className="text-orange-600">Approaching character limit</span>
+                    )}
                   </div>
-                ) : (
-                  <button
-                    onClick={() => setIsEditing(true)}
-                    className="bg-purple-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-purple-700 transition-colors shadow-lg"
-                  >
-                    Edit Profile
-                  </button>
-                )}
+                </div>
+              ) : (
+                <div className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl bg-gray-50 text-gray-700 min-h-[100px]">
+                  {profile?.bio || 'No bio written yet'}
+                </div>
+              )}
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-base font-bold text-gray-800 mb-1">Member Since</label>
+                <div className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-700">
+                {profile?.created_at ? new Date(profile.created_at).toLocaleDateString() : 'Recently joined'}
               </div>
             </div>
           </div>
+
+          <div className="mt-6 text-center">
+            {isEditing ? (
+              <div className="flex justify-center space-x-4">
+                <button
+                  onClick={handleSave}
+                  className="bg-purple-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-purple-700 transition-colors shadow-lg"
+                >
+                  Save Changes
+                </button>
+                <button
+                  onClick={() => setIsEditing(false)}
+                  className="border-2 border-purple-600 text-purple-600 px-6 py-3 rounded-xl font-semibold hover:bg-purple-600 hover:text-white transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            ) : (
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="bg-purple-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-purple-700 transition-colors shadow-lg"
+                >
+                  Edit Profile
+                </button>
+            )}
+            </div>
+          </div>
         </div>
+      </div>
+
+      {/* Back to Dashboard */}
+      <div className="text-center pb-16">
+        <a
+          href="/dashboard"
+          className="border-2 border-emerald-600 text-emerald-600 px-6 py-3 rounded-xl font-semibold hover:bg-emerald-600 hover:text-white transition-colors inline-block"
+        >
+          Back to Dashboard
+        </a>
       </div>
 
       {/* Toast Notifications */}
@@ -356,6 +354,7 @@ export default function ProfilePage() {
           </div>
         </div>
       )}
+    </div>
     </div>
   )
 }
