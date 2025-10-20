@@ -11,8 +11,8 @@ interface Profile {
   username: string | null
   full_name: string | null
   bio: string | null
-  avatar_url: string | null
   created_at: string
+  updated_at: string
 }
 
 export default function ProfilePage() {
@@ -24,8 +24,7 @@ export default function ProfilePage() {
   const [formData, setFormData] = useState({
     username: '',
     full_name: '',
-    bio: '',
-    avatar_url: ''
+    bio: ''
   })
   const [showToast, setShowToast] = useState(false)
   const [toastMessage, setToastMessage] = useState('')
@@ -55,7 +54,7 @@ export default function ProfilePage() {
         if (error) {
           if (error.code === 'PGRST116') {
             setProfile(null)
-            setFormData({ username: '', full_name: '', bio: '', avatar_url: '' })
+            setFormData({ username: '', full_name: '', bio: '' })
           } else {
             console.error('Error fetching profile:', error)
             setProfile(null)
@@ -65,8 +64,7 @@ export default function ProfilePage() {
           setFormData({
             username: data?.username || '',
             full_name: data?.full_name || '',
-            bio: data?.bio || '',
-            avatar_url: data?.avatar_url || ''
+            bio: data?.bio || ''
           })
         }
       } catch (error) {
@@ -96,6 +94,16 @@ export default function ProfilePage() {
       return
     }
 
+    if (formData.username.length > 50) {
+      showToastNotification('Username must be less than 50 characters', 'error')
+      return
+    }
+
+    if (formData.full_name && formData.full_name.length > 100) {
+      showToastNotification('Full name must be less than 100 characters', 'error')
+      return
+    }
+
     if (formData.bio && formData.bio.length > 500) {
       showToastNotification('Bio must be less than 500 characters', 'error')
       return
@@ -119,9 +127,8 @@ export default function ProfilePage() {
           .from('profiles')
           .update({
             username: formData.username.trim(),
-            full_name: formData.full_name.trim(),
-            bio: formData.bio.trim(),
-            avatar_url: formData.avatar_url.trim()
+            full_name: formData.full_name.trim() || null,
+            bio: formData.bio.trim() || null
           })
           .eq('id', user.id)
       } else {
@@ -130,14 +137,17 @@ export default function ProfilePage() {
           .insert({
             id: user.id,
             username: formData.username.trim(),
-            full_name: formData.full_name.trim(),
-            bio: formData.bio.trim(),
-            avatar_url: formData.avatar_url.trim()
+            full_name: formData.full_name.trim() || null,
+            bio: formData.bio.trim() || null
           })
       }
 
       if (result.error) {
-        showToastNotification('Error saving profile. Please try again.', 'error')
+        if (result.error.code === '23505') {
+          showToastNotification('Username already exists. Please choose a different one.', 'error')
+        } else {
+          showToastNotification('Error saving profile. Please try again.', 'error')
+        }
       } else {
         setProfile(prev => prev ? { ...prev, ...formData } : null)
         setIsEditing(false)
@@ -159,11 +169,10 @@ export default function ProfilePage() {
       setFormData({
         username: profile.username || '',
         full_name: profile.full_name || '',
-        bio: profile.bio || '',
-        avatar_url: profile.avatar_url || ''
+        bio: profile.bio || ''
       })
     } else {
-      setFormData({ username: '', full_name: '', bio: '', avatar_url: '' })
+      setFormData({ username: '', full_name: '', bio: '' })
     }
     setIsEditing(false)
   }
@@ -194,21 +203,11 @@ export default function ProfilePage() {
         <div className="bg-white rounded-2xl shadow-lg p-8 border border-white/20">
           <div className="text-center mb-8">
             <div className="relative inline-block mb-4">
-              {profile?.avatar_url ? (
-                <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-purple-500 shadow-lg mx-auto">
-                  <img
-                    src={profile.avatar_url}
-                    alt="Profile Avatar"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              ) : (
-                <div className="w-24 h-24 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-full flex items-center justify-center mx-auto shadow-lg">
-                  <span className="text-white text-3xl">
-                    {profile?.username?.charAt(0) || profile?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
-                  </span>
-                </div>
-              )}
+              <div className="w-24 h-24 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-full flex items-center justify-center mx-auto shadow-lg">
+                <span className="text-white text-3xl">
+                  {profile?.username?.charAt(0) || profile?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
+                </span>
+              </div>
             </div>
             
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
@@ -221,18 +220,28 @@ export default function ProfilePage() {
           </div>
 
           <div className="max-w-2xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-6">
+              {/* Username Field */}
               <div>
-                <label className="block text-lg font-bold text-gray-800 mb-2">Username *</label>
+                <label className="block text-lg font-bold text-gray-800 mb-2">
+                  Username <span className="text-red-500">*</span>
+                </label>
                 {isEditing ? (
-                  <input
-                    type="text"
-                    name="username"
-                    value={formData.username}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-300 bg-white text-gray-900"
-                    placeholder="Enter username"
-                  />
+                  <div>
+                    <input
+                      type="text"
+                      name="username"
+                      value={formData.username}
+                      onChange={handleChange}
+                      maxLength={50}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-300 bg-white text-gray-900"
+                      placeholder="Enter username (3-50 characters)"
+                      required
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      {formData.username.length}/50 characters
+                    </p>
+                  </div>
                 ) : (
                   <div className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl bg-gray-50 text-gray-700">
                     {profile?.username || 'No username set'}
@@ -240,91 +249,109 @@ export default function ProfilePage() {
                 )}
               </div>
 
+              {/* Full Name Field */}
               <div>
                 <label className="block text-lg font-bold text-gray-800 mb-2">Full Name</label>
                 {isEditing ? (
-                  <input
-                    type="text"
-                    name="full_name"
-                    value={formData.full_name}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-300 bg-white text-gray-900"
-                    placeholder="Enter full name"
-                  />
+                  <div>
+                    <input
+                      type="text"
+                      name="full_name"
+                      value={formData.full_name}
+                      onChange={handleChange}
+                      maxLength={100}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-300 bg-white text-gray-900"
+                      placeholder="Enter full name (optional)"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      {formData.full_name.length}/100 characters
+                    </p>
+                  </div>
                 ) : (
                   <div className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl bg-gray-50 text-gray-700">
                     {profile?.full_name || 'No full name set'}
                   </div>
                 )}
               </div>
-            </div>
 
-            <div className="mt-6">
-              <label className="block text-lg font-bold text-gray-800 mb-2">Bio</label>
-              {isEditing ? (
-                <textarea
-                  name="bio"
-                  value={formData.bio}
-                  onChange={handleChange}
-                  rows={4}
-                  maxLength={500}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-300 bg-white text-gray-900 resize-none"
-                  placeholder="Tell us about yourself..."
-                />
-              ) : (
-                <div className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl bg-gray-50 text-gray-700 min-h-[100px]">
-                  {profile?.bio || 'No bio set'}
+              {/* Bio Field */}
+              <div>
+                <label className="block text-lg font-bold text-gray-800 mb-2">Bio</label>
+                {isEditing ? (
+                  <div>
+                    <textarea
+                      name="bio"
+                      value={formData.bio}
+                      onChange={handleChange}
+                      rows={4}
+                      maxLength={500}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-300 bg-white text-gray-900 resize-none"
+                      placeholder="Tell us about yourself... (optional)"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      {formData.bio.length}/500 characters
+                    </p>
+                  </div>
+                ) : (
+                  <div className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl bg-gray-50 text-gray-700 min-h-[100px]">
+                    {profile?.bio || 'No bio set'}
+                  </div>
+                )}
+              </div>
+
+              {/* Profile Stats */}
+              <div className="bg-gray-50 rounded-xl p-4">
+                <h3 className="text-lg font-bold text-gray-900 mb-3">Profile Information</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">User ID:</span>
+                    <span className="font-mono text-gray-900 text-xs">{user?.id?.slice(0, 8)}...</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Email:</span>
+                    <span className="text-gray-900">{user?.email}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Profile Created:</span>
+                    <span className="text-gray-900">
+                      {profile?.created_at ? new Date(profile.created_at).toLocaleDateString() : 'Not created'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Last Updated:</span>
+                    <span className="text-gray-900">
+                      {profile?.updated_at ? new Date(profile.updated_at).toLocaleDateString() : 'Never'}
+                    </span>
+                  </div>
                 </div>
-              )}
-              {isEditing && (
-                <p className="text-xs text-gray-500 mt-1">
-                  {formData.bio.length}/500 characters
-                </p>
-              )}
-            </div>
+              </div>
 
-            <div className="mt-6">
-              <label className="block text-lg font-bold text-gray-800 mb-2">Avatar URL</label>
-              {isEditing ? (
-                <input
-                  type="url"
-                  name="avatar_url"
-                  value={formData.avatar_url}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-300 bg-white text-gray-900"
-                  placeholder="Enter image URL"
-                />
-              ) : (
-                <div className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl bg-gray-50 text-gray-700">
-                  {profile?.avatar_url ? 'Avatar set' : 'No avatar set'}
-                </div>
-              )}
-            </div>
-
-            <div className="mt-8 text-center">
-              {isEditing ? (
-                <div className="flex justify-center space-x-4">
+              {/* Action Buttons */}
+              <div className="text-center pt-6">
+                {isEditing ? (
+                  <div className="flex justify-center space-x-4">
+                    <button
+                      onClick={handleSave}
+                      className="bg-purple-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-purple-700 transition-colors shadow-lg"
+                    >
+                      Save Changes
+                    </button>
+                    <button
+                      onClick={handleCancel}
+                      className="border-2 border-purple-600 text-purple-600 px-8 py-3 rounded-xl font-semibold hover:bg-purple-600 hover:text-white transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                ) : (
                   <button
-                    onClick={handleSave}
+                    onClick={() => setIsEditing(true)}
                     className="bg-purple-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-purple-700 transition-colors shadow-lg"
                   >
-                    Save Changes
+                    Edit Profile
                   </button>
-                  <button
-                    onClick={handleCancel}
-                    className="border-2 border-purple-600 text-purple-600 px-8 py-3 rounded-xl font-semibold hover:bg-purple-600 hover:text-white transition-colors"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              ) : (
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="bg-purple-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-purple-700 transition-colors shadow-lg"
-                >
-                  Edit Profile
-                </button>
-              )}
+                )}
+              </div>
             </div>
           </div>
         </div>
