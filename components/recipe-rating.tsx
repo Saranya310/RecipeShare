@@ -12,6 +12,7 @@ interface Rating {
   review: string | null
   created_at: string
   updated_at: string
+  username?: string | null
   profiles?: {
     username: string | null
     full_name: string | null
@@ -39,20 +40,31 @@ export default function RecipeRating({ recipeId, recipeOwnerId }: RecipeRatingPr
       setLoading(true)
       
       // Fetch all ratings for this recipe
-      const { data: ratingsData } = await supabase
+      const { data: ratingsData, error: ratingsError } = await supabase
         .from('recipe_ratings')
-        .select(`
-          *,
-          profiles (
-            username,
-            full_name
-          )
-        `)
+        .select('*')
         .eq('recipe_id', recipeId)
         .order('created_at', { ascending: false })
 
+
       if (ratingsData) {
-        setRatings(ratingsData)
+        // Fetch profiles for each rating
+        const ratingsWithProfiles = await Promise.all(
+          ratingsData.map(async (rating) => {
+            const { data: profileData } = await supabase
+              .from('profiles')
+              .select('username, full_name')
+              .eq('id', rating.user_id)
+              .single()
+            
+            return {
+              ...rating,
+              profiles: profileData
+            }
+          })
+        )
+        
+        setRatings(ratingsWithProfiles)
       }
 
       // Fetch user's rating if logged in
@@ -211,33 +223,33 @@ export default function RecipeRating({ recipeId, recipeOwnerId }: RecipeRatingPr
   const averageRating = calculateAverageRating()
 
   return (
-    <div className="space-y-8">
-      {/* Enhanced Rating Summary */}
-      <div className="bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl p-8 border border-white/30">
-        <div className="flex items-center justify-between mb-8">
-          <h3 className="text-3xl font-bold text-gray-900 flex items-center">
-            <span className="w-10 h-10 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-2xl flex items-center justify-center mr-4 shadow-lg">
-              <span className="text-white text-lg">⭐</span>
+    <div className="space-y-4">
+      {/* Compact Rating Summary */}
+      <div className="bg-white/90 backdrop-blur-md rounded-xl shadow-lg p-4 border border-white/30">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-bold text-gray-900 flex items-center">
+            <span className="w-6 h-6 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-lg flex items-center justify-center mr-2 shadow-sm">
+              <span className="text-white text-xs">⭐</span>
             </span>
             Ratings & Reviews
           </h3>
           <div className="text-right">
-            <div className="text-5xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+            <div className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
               {averageRating}
             </div>
-            <div className="text-sm text-gray-500 font-medium">out of 5</div>
+            <div className="text-xs text-gray-500 font-medium">out of 5</div>
           </div>
         </div>
         
-        <div className="flex items-center space-x-8 mb-8">
-          <div className="flex items-center space-x-2">
-            {renderStars(averageRating, false, 'lg')}
+        <div className="flex items-center space-x-4 mb-4">
+          <div className="flex items-center space-x-1">
+            {renderStars(averageRating, false, 'md')}
           </div>
           <div className="flex-1">
-            <p className="text-lg font-semibold text-gray-800">
+            <p className="text-sm font-semibold text-gray-800">
               Based on {ratings.length} review{ratings.length !== 1 ? 's' : ''}
             </p>
-            <p className="text-sm text-gray-600">
+            <p className="text-xs text-gray-600">
               {ratings.length > 0 ? 'Community feedback from fellow cooks' : 'Be the first to review this recipe!'}
             </p>
           </div>
@@ -245,9 +257,9 @@ export default function RecipeRating({ recipeId, recipeOwnerId }: RecipeRatingPr
 
         {/* Rating Distribution */}
         {ratings.length > 0 && (
-          <div className="bg-gradient-to-r from-gray-50 to-slate-50 rounded-2xl p-6">
-            <h4 className="text-lg font-bold text-gray-800 mb-4">Rating Breakdown</h4>
-            <div className="space-y-3">
+          <div className="bg-gradient-to-r from-gray-50 to-slate-50 rounded-lg p-3">
+            <h4 className="text-sm font-bold text-gray-800 mb-3">Rating Breakdown</h4>
+            <div className="space-y-2">
               {[5, 4, 3, 2, 1].map((star) => {
                 const count = ratings.filter(r => r.rating === star).length
                 const percentage = ratings.length > 0 ? (count / ratings.length) * 100 : 0
@@ -275,42 +287,42 @@ export default function RecipeRating({ recipeId, recipeOwnerId }: RecipeRatingPr
           </div>
         )}
 
-        {/* Enhanced User Rating Form */}
+        {/* Compact User Rating Form */}
         {user && user.id !== recipeOwnerId && (
-          <div className="border-t border-gray-200 pt-8">
+          <div className="border-t border-gray-200 pt-4">
             {!userRating ? (
-              <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl p-6">
-                <h4 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
-                  <span className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-lg flex items-center justify-center mr-3">
-                    <span className="text-white text-sm">⭐</span>
+              <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-lg p-4">
+                <h4 className="text-base font-bold text-gray-900 mb-3 flex items-center">
+                  <span className="w-5 h-5 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-md flex items-center justify-center mr-2">
+                    <span className="text-white text-xs">⭐</span>
                   </span>
                   Rate this recipe
                 </h4>
-                <div className="flex items-center space-x-4 mb-6">
-                  <span className="text-lg font-semibold text-gray-700">Your rating:</span>
-                  {renderStars(newRating, true, 'lg')}
-                  <span className="text-lg font-bold text-gray-800 bg-white px-3 py-1 rounded-full shadow-sm">
+                <div className="flex items-center space-x-3 mb-3">
+                  <span className="text-sm font-semibold text-gray-700">Your rating:</span>
+                  {renderStars(newRating, true, 'md')}
+                  <span className="text-sm font-bold text-gray-800 bg-white px-2 py-1 rounded-full shadow-sm">
                     {newRating}/5
                   </span>
                 </div>
                 <button
                   onClick={() => setShowReviewForm(!showReviewForm)}
-                  className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-emerald-700 hover:to-teal-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                  className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-4 py-2 rounded-lg font-semibold hover:from-emerald-700 hover:to-teal-700 transition-all duration-300 shadow-md hover:shadow-lg text-sm"
                 >
                   {showReviewForm ? 'Hide review form' : 'Add a written review'}
                 </button>
               </div>
             ) : (
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6">
-                <h4 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                  <span className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-lg flex items-center justify-center mr-3">
-                    <span className="text-white text-sm">✅</span>
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4">
+                <h4 className="text-base font-bold text-gray-900 mb-3 flex items-center">
+                  <span className="w-5 h-5 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-md flex items-center justify-center mr-2">
+                    <span className="text-white text-xs">✅</span>
                   </span>
                   Your rating
                 </h4>
-                <div className="flex items-center space-x-4 mb-4">
-                  {renderStars(userRating.rating, false, 'lg')}
-                  <span className="text-lg font-bold text-gray-800 bg-white px-3 py-1 rounded-full shadow-sm">
+                <div className="flex items-center space-x-3 mb-3">
+                  {renderStars(userRating.rating, false, 'md')}
+                  <span className="text-sm font-bold text-gray-800 bg-white px-2 py-1 rounded-full shadow-sm">
                     {userRating.rating}/5
                   </span>
                 </div>
@@ -321,35 +333,35 @@ export default function RecipeRating({ recipeId, recipeOwnerId }: RecipeRatingPr
                 )}
                 <button
                   onClick={() => setShowReviewForm(!showReviewForm)}
-                  className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                  className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 shadow-md hover:shadow-lg text-sm"
                 >
                   {showReviewForm ? 'Cancel' : 'Update your review'}
                 </button>
               </div>
             )}
 
-            {/* Enhanced Review Form */}
+            {/* Compact Review Form */}
             {showReviewForm && (
-              <div className="mt-8 bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-white/30 shadow-lg">
-                <form onSubmit={handleSubmitRating} className="space-y-6">
+              <div className="mt-4 bg-white/80 backdrop-blur-sm rounded-lg p-4 border border-white/30 shadow-md">
+                <form onSubmit={handleSubmitRating} className="space-y-4">
                   <div>
-                    <label className="block text-lg font-bold text-gray-800 mb-4 flex items-center">
-                      <span className="w-6 h-6 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-lg flex items-center justify-center mr-2">
+                    <label className="block text-sm font-bold text-gray-800 mb-2 flex items-center">
+                      <span className="w-4 h-4 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-md flex items-center justify-center mr-2">
                         <span className="text-white text-xs">⭐</span>
                       </span>
                       Your rating: {newRating}/5
                     </label>
                     <div className="flex items-center space-x-2">
-                      {renderStars(newRating, true, 'lg')}
-                      <span className="text-lg font-bold text-gray-800 bg-gradient-to-r from-yellow-100 to-orange-100 px-3 py-1 rounded-full">
+                      {renderStars(newRating, true, 'md')}
+                      <span className="text-sm font-bold text-gray-800 bg-gradient-to-r from-yellow-100 to-orange-100 px-2 py-1 rounded-full">
                         {newRating} out of 5 stars
                       </span>
                     </div>
                   </div>
                   
                   <div>
-                    <label htmlFor="review" className="block text-lg font-bold text-gray-800 mb-4 flex items-center">
-                      <span className="w-6 h-6 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-lg flex items-center justify-center mr-2">
+                    <label htmlFor="review" className="block text-sm font-bold text-gray-800 mb-2 flex items-center">
+                      <span className="w-4 h-4 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-md flex items-center justify-center mr-2">
                         <span className="text-white text-xs">📝</span>
                       </span>
                       Share your experience (optional)
@@ -358,39 +370,37 @@ export default function RecipeRating({ recipeId, recipeOwnerId }: RecipeRatingPr
                       id="review"
                       value={newReview}
                       onChange={(e) => setNewReview(e.target.value)}
-                      rows={4}
-                      className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all duration-300 bg-white/80 backdrop-blur-sm text-gray-900 placeholder-gray-500 shadow-lg hover:shadow-xl resize-none"
-                      placeholder="Tell us about your experience with this recipe... What did you like? Any tips for others?"
+                      rows={3}
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all duration-300 bg-white/80 backdrop-blur-sm text-gray-900 placeholder-gray-500 shadow-sm hover:shadow-md resize-none text-sm"
+                      placeholder="Tell us about your experience with this recipe..."
                     />
-                    <p className="text-sm text-gray-500 mt-2">
-                      Help other cooks by sharing your experience and any helpful tips!
+                    <p className="text-xs text-gray-500 mt-1">
+                      Help other cooks by sharing your experience!
                     </p>
                   </div>
 
-                  <div className="flex space-x-4">
+                  <div className="flex space-x-3">
                     <button
                       type="submit"
                       disabled={submitting || newRating === 0}
-                      className="flex-1 bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 text-white px-8 py-4 rounded-2xl font-bold hover:from-emerald-700 hover:via-teal-700 hover:to-cyan-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-xl hover:shadow-2xl transform hover:-translate-y-1 text-lg relative overflow-hidden"
+                      className="flex-1 bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-4 py-2 rounded-lg font-semibold hover:from-emerald-700 hover:to-teal-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg text-sm"
                     >
                       {submitting ? (
                         <div className="flex items-center justify-center">
-                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
                           Submitting...
                         </div>
                       ) : (
                         <>
-                          <span className="mr-2">✨</span>
+                          <span className="mr-1">✨</span>
                           {userRating ? 'Update Rating' : 'Submit Rating'}
-                          <span className="ml-2">🚀</span>
                         </>
                       )}
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 -translate-x-full hover:translate-x-full transition-transform duration-1000"></div>
                     </button>
                     <button
                       type="button"
                       onClick={() => setShowReviewForm(false)}
-                      className="px-8 py-4 border-2 border-gray-300 text-gray-700 rounded-2xl font-bold hover:bg-gray-50 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                      className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-all duration-300 shadow-sm hover:shadow-md text-sm"
                     >
                       Cancel
                     </button>
@@ -402,16 +412,16 @@ export default function RecipeRating({ recipeId, recipeOwnerId }: RecipeRatingPr
         )}
 
         {!user && (
-          <div className="border-t border-gray-200 pt-8 text-center">
-            <div className="bg-gradient-to-r from-gray-50 to-slate-50 rounded-2xl p-8">
-              <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-                <span className="text-white text-2xl">🔐</span>
+          <div className="border-t border-gray-200 pt-4 text-center">
+            <div className="bg-gradient-to-r from-gray-50 to-slate-50 rounded-lg p-4">
+              <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-lg flex items-center justify-center mx-auto mb-2 shadow-sm">
+                <span className="text-white text-sm">🔐</span>
               </div>
-              <h4 className="text-xl font-bold text-gray-900 mb-2">Join the Community</h4>
-              <p className="text-gray-600 mb-6">Please log in to rate and review recipes</p>
+              <h4 className="text-base font-bold text-gray-900 mb-1">Join the Community</h4>
+              <p className="text-sm text-gray-600 mb-3">Please log in to rate and review recipes</p>
               <button
                 onClick={() => window.location.href = '/'}
-                className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-8 py-4 rounded-2xl font-bold hover:from-emerald-700 hover:to-teal-700 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1"
+                className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-4 py-2 rounded-lg font-semibold hover:from-emerald-700 hover:to-teal-700 transition-all duration-300 shadow-md hover:shadow-lg text-sm"
               >
                 Log In to Review
               </button>
@@ -420,29 +430,29 @@ export default function RecipeRating({ recipeId, recipeOwnerId }: RecipeRatingPr
         )}
       </div>
 
-      {/* Enhanced Reviews List */}
+      {/* Compact Reviews List */}
       {ratings.length > 0 && (
-        <div className="space-y-6">
-          <h4 className="text-2xl font-bold text-gray-900 flex items-center">
-            <span className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center mr-3">
-              <span className="text-white text-sm">💬</span>
+        <div className="space-y-3">
+          <h4 className="text-lg font-bold text-gray-900 flex items-center">
+            <span className="w-5 h-5 bg-gradient-to-br from-purple-500 to-pink-500 rounded-md flex items-center justify-center mr-2">
+              <span className="text-white text-xs">💬</span>
             </span>
             Community Reviews
           </h4>
-          <div className="grid gap-6">
+          <div className="grid gap-3">
             {ratings.map((rating) => (
-              <div key={rating.id} className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/30 hover:shadow-xl transition-all duration-300">
-                <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-emerald-400 to-teal-400 rounded-2xl flex items-center justify-center text-white font-bold text-lg shadow-lg">
-                    {(rating.profiles?.username || rating.profiles?.full_name || 'A').charAt(0).toUpperCase()}
+              <div key={rating.id} className="bg-white/80 backdrop-blur-sm rounded-lg p-4 shadow-md border border-white/30 hover:shadow-lg transition-all duration-300">
+                <div className="flex items-start space-x-3">
+                  <div className="w-8 h-8 bg-gradient-to-br from-emerald-400 to-teal-400 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-sm">
+                    {(rating.username || rating.profiles?.username || rating.profiles?.full_name || rating.user_id).charAt(0).toUpperCase()}
                   </div>
                   <div className="flex-1">
-                    <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center justify-between mb-2">
                       <div>
-                        <h5 className="font-bold text-gray-900 text-lg">
-                          {rating.profiles?.username || rating.profiles?.full_name || 'Anonymous'}
+                        <h5 className="font-bold text-gray-900 text-sm">
+                          {rating.username || rating.profiles?.username || rating.profiles?.full_name || `User ${rating.user_id.slice(0, 8)}...`}
                         </h5>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-xs text-gray-500">
                           {new Date(rating.created_at).toLocaleDateString('en-US', {
                             year: 'numeric',
                             month: 'long',
@@ -450,16 +460,16 @@ export default function RecipeRating({ recipeId, recipeOwnerId }: RecipeRatingPr
                           })}
                         </p>
                       </div>
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-1">
                         {renderStars(rating.rating, false, 'sm')}
-                        <span className="text-sm font-bold text-gray-700 bg-gradient-to-r from-yellow-100 to-orange-100 px-2 py-1 rounded-full">
+                        <span className="text-xs font-bold text-gray-700 bg-gradient-to-r from-yellow-100 to-orange-100 px-2 py-1 rounded-full">
                           {rating.rating}/5
                         </span>
                       </div>
                     </div>
                     {rating.review && (
-                      <div className="bg-gradient-to-r from-gray-50 to-slate-50 rounded-xl p-4 border border-gray-100">
-                        <p className="text-gray-800 leading-relaxed">{rating.review}</p>
+                      <div className="bg-gradient-to-r from-gray-50 to-slate-50 rounded-lg p-3 border border-gray-100">
+                        <p className="text-gray-800 leading-relaxed text-sm">{rating.review}</p>
                       </div>
                     )}
                   </div>

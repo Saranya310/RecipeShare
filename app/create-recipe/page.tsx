@@ -9,7 +9,7 @@ import CategorySelector from '@/components/category-selector'
 import RecipeNavigation from '@/components/recipe-navigation'
 
 export default function CreateRecipe() {
-  const { user } = useAuth()
+  const { user, loading: authLoading } = useAuth()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
@@ -35,12 +35,13 @@ export default function CreateRecipe() {
     setTimeout(() => setShowToast(false), 3000)
   }
 
-  // Redirect if not authenticated
+  // Redirect if not authenticated (only after auth loading is complete)
   useEffect(() => {
-    if (!user) {
+    if (!authLoading && user === null) {
+      // User is not authenticated, redirect to home
       router.push('/')
     }
-  }, [user, router])
+  }, [user, authLoading, router])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -139,10 +140,30 @@ export default function CreateRecipe() {
     }
   }
 
-  if (!user) {
+  // Show loading state while checking authentication
+  if (authLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-50 flex items-center justify-center">
-        <p className="text-sm text-gray-700">Loading...</p>
+        <div className="text-center">
+          <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center mx-auto mb-3 animate-pulse">
+            <span className="text-white text-lg">🍳</span>
+          </div>
+          <p className="text-sm text-gray-700">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Redirect if user is not authenticated (only after auth loading is complete)
+  if (!authLoading && user === null) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center mx-auto mb-3">
+            <span className="text-white text-lg">🔒</span>
+          </div>
+          <p className="text-sm text-gray-700">Redirecting to login...</p>
+        </div>
       </div>
     )
   }
@@ -182,7 +203,7 @@ export default function CreateRecipe() {
 
             {/* Category Selection */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Category</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-1"></label>
               <CategorySelector
                 onCategorySelect={handleCategorySelect}
                 selectedCategoryId={formData.category_id}

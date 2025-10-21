@@ -30,6 +30,15 @@ interface Recipe {
     username: string | null
     full_name: string | null
   }
+  // Rating data
+  average_rating?: number
+  total_ratings?: number
+  recipe_ratings?: Array<{
+    rating: number
+    review: string | null
+    created_at: string
+    user_id: string
+  }>
 }
 
 interface RecipeDetailsPageProps {
@@ -39,6 +48,7 @@ interface RecipeDetailsPageProps {
 }
 
 export default function RecipeDetailsPage({ params }: RecipeDetailsPageProps) {
+  const { id: recipeId } = use(params)
   const { user } = useAuth()
   const router = useRouter()
   const [recipe, setRecipe] = useState<Recipe | null>(null)
@@ -46,68 +56,112 @@ export default function RecipeDetailsPage({ params }: RecipeDetailsPageProps) {
   const [error, setError] = useState<string | null>(null)
   const [deleting, setDeleting] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
-  
-  // Unwrap the params Promise
-  const resolvedParams = use(params)
 
   useEffect(() => {
     async function fetchRecipe() {
-      setLoading(true)
-      setError(null)
+      if (!recipeId) {
+        setError('Recipe ID is required')
+        setLoading(false)
+        return
+      }
 
-      const { data, error: fetchError } = await supabase
-        .from('recipes')
-        .select(`
-          *,
-          categories (
-            name,
-            emoji
-          )
-        `)
-        .eq('id', resolvedParams.id)
-        .single()
+      try {
+        // First try with basic recipe data
+        let { data, error } = await supabase
+          .from('recipes')
+          .select(`
+            *,
+            categories (
+              name,
+              emoji
+            )
+          `)
+          .eq('id', recipeId)
+          .single()
 
-      if (fetchError) {
-        console.error('Error fetching recipe:', fetchError)
-        console.error('Recipe ID:', resolvedParams.id)
-        setError('Recipe not found')
-      } else {
-        setRecipe(data)
-        
-        // Fetch user profile information
-        if (data?.user_id) {
-          const { data: profileData } = await supabase
-            .from('profiles')
-            .select('username, full_name')
-            .eq('id', data.user_id)
+        // If that fails, try without joins
+        if (error) {
+          const simpleResult = await supabase
+            .from('recipes')
+            .select('*')
+            .eq('id', recipeId)
             .single()
           
-          if (profileData) {
-            setRecipe(prev => prev ? ({
-              ...prev,
-              profiles: profileData
-            }) : null)
+          if (simpleResult.error) {
+            data = null
+            error = simpleResult.error
+          } else {
+            data = simpleResult.data
+            error = null
           }
         }
+        
+        // Fetch ratings separately if we have recipe data
+        if (data && !error) {
+          const [profileResult, ratingsResult] = await Promise.all([
+            supabase
+              .from('profiles')
+              .select('username, full_name')
+              .eq('id', data.user_id)
+              .single(),
+            supabase
+              .from('recipe_ratings')
+              .select(`
+                rating,
+                review,
+                created_at,
+                user_id
+              `)
+              .eq('recipe_id', recipeId)
+          ])
+          
+          data = {
+            ...data,
+            profiles: profileResult.data,
+            recipe_ratings: ratingsResult.data || []
+          }
+        }
+
+        if (error) {
+          console.error('Error fetching recipe:', error)
+          setError(`Recipe not found: ${error.message}`)
+        } else {
+          // Process rating data
+          const ratings = data.recipe_ratings || []
+          const average_rating = ratings.length > 0 
+            ? ratings.reduce((sum: number, r: any) => sum + r.rating, 0) / ratings.length 
+            : 0
+          const total_ratings = ratings.length
+
+          const processedRecipe = {
+            ...data,
+            average_rating,
+            total_ratings
+          }
+          
+          setRecipe(processedRecipe)
+        }
+      } catch (err: any) {
+        console.error('Unexpected error:', err)
+        setError(`Failed to load recipe: ${err.message}`)
+      } finally {
+        setLoading(false)
       }
-      
-      setLoading(false)
     }
 
     fetchRecipe()
-  }, [resolvedParams.id])
+  }, [recipeId])
 
   const handleDeleteRecipe = async () => {
     if (!user || !recipe) return
 
     setDeleting(true)
     try {
-      // Delete the recipe
       const { error } = await supabase
         .from('recipes')
         .delete()
         .eq('id', recipe.id)
-        .eq('user_id', user.id) // Ensure only the owner can delete
+        .eq('user_id', user.id)
 
       if (error) {
         throw error
@@ -135,20 +189,21 @@ export default function RecipeDetailsPage({ params }: RecipeDetailsPageProps) {
 
   const formatTime = (minutes: number | null) => {
     if (minutes === null || minutes === 0) return 'N/A'
-    if (minutes < 60) return `${minutes} minutes`
+    if (minutes < 60) return `${minutes} min`
     const hours = Math.floor(minutes / 60)
     const remainingMinutes = minutes % 60
-    return `${hours} hour${hours !== 1 ? 's' : ''}${remainingMinutes > 0 ? ` ${remainingMinutes} minutes` : ''}`
+    return `${hours}h${remainingMinutes > 0 ? ` ${remainingMinutes}m` : ''}`
   }
-
-  const totalTime = (recipe?.prep_time || 0) + (recipe?.cook_time || 0)
 
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-50 flex items-center justify-center">
-        <div className="text-center p-8 bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-white/20">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-emerald-500 mx-auto mb-4"></div>
-          <p className="text-xl font-semibold text-gray-700">Loading recipe...</p>
+        <div className="text-center">
+          <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center mx-auto mb-3 animate-pulse">
+            <span className="text-white text-lg">🍳</span>
+          </div>
+          <p className="text-sm text-gray-700">Loading recipe...</p>
+          <p className="text-xs text-gray-500 mt-2">Recipe ID: {recipeId}</p>
         </div>
       </div>
     )
@@ -157,42 +212,53 @@ export default function RecipeDetailsPage({ params }: RecipeDetailsPageProps) {
   if (error || !recipe) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-50 flex items-center justify-center">
-        <div className="text-center p-8 bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-white/20">
-          <p className="text-2xl font-bold text-red-600 mb-4">Error</p>
-          <p className="text-lg text-gray-700 mb-6">{error || 'Recipe not found.'}</p>
-          <button
-            onClick={() => router.push('/recipes')}
-            className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
+        <div className="text-center">
+          <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center mx-auto mb-3">
+            <span className="text-white text-lg">❌</span>
+          </div>
+          <p className="text-base font-semibold text-gray-700 mb-2">Error</p>
+          <p className="text-sm text-gray-500 mb-4">{error || 'Recipe not found.'}</p>
+          <a
+            href="/recipes"
+            className="bg-emerald-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-emerald-700 transition-colors text-sm"
           >
             Back to Recipes
-          </button>
+          </a>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-50 font-zilla-slab">
-      {/* Navigation (simplified for recipe view) */}
-      <nav className="bg-white/80 backdrop-blur-sm shadow-sm border-b border-white/20">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-50">
+      {/* Navigation */}
+      <nav className="bg-white shadow-lg border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">🍳 RecipeShare</h1>
+              <div className="flex-shrink-0">
+                <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center">
+                  <span className="text-white text-lg font-bold">🍳</span>
+                </div>
+              </div>
+              <div className="ml-3">
+                <h1 className="text-lg font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">RecipeShare</h1>
+              </div>
             </div>
             <div className="flex items-center space-x-4">
-              <button
-                onClick={() => router.push('/dashboard')}
-                className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+              <a 
+                href="/dashboard"
+                className="text-gray-700 hover:text-emerald-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
               >
-                Back to Dashboard
-              </button>
+                Dashboard
+              </a>
               {user?.id === recipe.user_id && (
                 <button
-                  onClick={() => router.push(`/recipes/${recipe.id}/edit`)}
-                  className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-semibold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-300 text-sm"
+                  onClick={() => setShowDeleteConfirm(true)}
+                  className="inline-flex items-center bg-red-600 text-white px-3 py-2 rounded-lg font-semibold hover:bg-red-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 text-sm"
                 >
-                  Edit Recipe
+                  <span className="text-sm mr-2">🗑️</span>
+                  Delete Recipe
                 </button>
               )}
             </div>
@@ -200,55 +266,61 @@ export default function RecipeDetailsPage({ params }: RecipeDetailsPageProps) {
         </div>
       </nav>
 
-      {/* Enhanced Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Consistent Recipe Image */}
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 overflow-hidden">
-            <div className="relative h-full min-h-[400px] bg-gradient-to-br from-emerald-200 to-teal-200 flex items-center justify-center">
+      {/* Compact Hero Section */}
+      <div className="relative py-6 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto text-center">
+          <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg">
+            <span className="text-white text-lg">🍽️</span>
+          </div>
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">
+            {recipe.title}
+          </h1>
+          <p className="text-sm text-gray-600 max-w-2xl mx-auto">
+            {recipe.description || 'Delicious recipe to try'}
+          </p>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Recipe Image */}
+          <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+            <div className="relative aspect-[4/3] bg-gradient-to-br from-emerald-200 to-teal-200 flex items-center justify-center">
               {recipe.image_url ? (
                 <img 
                   src={recipe.image_url} 
                   alt={recipe.title}
-                  className="w-full h-full object-cover"
+                  className="absolute inset-0 w-full h-full object-cover object-center"
                 />
               ) : (
-                <div className="text-center">
-                  <span className="text-6xl mb-4 block">🍽️</span>
-                  <p className="text-gray-600 text-base">No image available</p>
+                <div className="text-center z-10 relative">
+                  <span className="text-4xl mb-2 block">🍽️</span>
+                  <p className="text-gray-600 text-sm">No image available</p>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Consistent Recipe Info */}
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6">
-            <div className="flex items-start justify-between mb-6">
+          {/* Recipe Info */}
+          <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
+            <div className="flex items-start justify-between mb-4">
               <div className="flex-1 mr-4">
-                <h1 className="text-4xl font-bold text-gray-900 mb-3">
-                  {recipe.title}
-                </h1>
                 {recipe.categories && (
-                  <div className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-purple-100 to-pink-100 border border-purple-200">
-                    <span className="text-lg mr-2">{recipe.categories.emoji}</span>
-                    <span className="text-sm font-semibold text-purple-700">{recipe.categories.name}</span>
+                  <div className="inline-flex items-center px-3 py-1 rounded-full bg-gradient-to-r from-purple-100 to-pink-100 border border-purple-200 mb-3">
+                    <span className="text-sm mr-2">{recipe.categories.emoji}</span>
+                    <span className="text-xs font-semibold text-purple-700">{recipe.categories.name}</span>
                   </div>
                 )}
               </div>
-              <FavoriteButton recipeId={recipe.id} size="lg" />
+              <FavoriteButton recipeId={recipe.id} size="sm" />
             </div>
-            
-            {recipe.description && (
-              <p className="text-gray-700 text-lg leading-relaxed mb-6">{recipe.description}</p>
-            )}
 
-            {/* Compact Recipe Meta */}
-            <div className="bg-gradient-to-r from-gray-50 to-slate-50 rounded-2xl p-6 border border-gray-100 mb-6">
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {/* Recipe Meta */}
+            <div className="bg-gray-50 rounded-lg p-4 mb-4">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div className="text-center">
-                  <div className="flex items-center justify-center mb-2">
-                    <span className="text-lg">⚡</span>
-                  </div>
+                  <div className="text-sm mb-1">⚡</div>
                   <div className="text-xs text-gray-600 mb-1">Difficulty</div>
                   {recipe.difficulty && (
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(recipe.difficulty)}`}>
@@ -258,60 +330,47 @@ export default function RecipeDetailsPage({ params }: RecipeDetailsPageProps) {
                 </div>
                 
                 <div className="text-center">
-                  <div className="flex items-center justify-center mb-2">
-                    <span className="text-lg">👥</span>
-                  </div>
+                  <div className="text-sm mb-1">👥</div>
                   <div className="text-xs text-gray-600 mb-1">Servings</div>
                   <div className="text-sm font-bold text-gray-900">{recipe.servings || 'N/A'}</div>
                 </div>
 
                 <div className="text-center">
-                  <div className="flex items-center justify-center mb-2">
-                    <span className="text-lg">⏱️</span>
-                  </div>
+                  <div className="text-sm mb-1">⏱️</div>
                   <div className="text-xs text-gray-600 mb-1">Prep Time</div>
                   <div className="text-sm font-bold text-gray-900">{formatTime(recipe.prep_time)}</div>
                 </div>
                 
                 <div className="text-center">
-                  <div className="flex items-center justify-center mb-2">
-                    <span className="text-lg">🔥</span>
-                  </div>
+                  <div className="text-sm mb-1">🔥</div>
                   <div className="text-xs text-gray-600 mb-1">Cook Time</div>
                   <div className="text-sm font-bold text-gray-900">{formatTime(recipe.cook_time)}</div>
                 </div>
               </div>
             </div>
 
-            {/* Compact Author Section */}
-            <div className="mt-6 pt-4 border-t border-gray-200">
-              <div className="flex items-center justify-between bg-gray-50 rounded-xl p-3">
-                <div className="flex items-center">
-                  <div className="w-8 h-8 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-md">
-                    {recipe.profiles?.username?.charAt(0) || recipe.profiles?.full_name?.charAt(0) || 'U'}
-                  </div>
-                  <div className="ml-3">
-                    <p className="text-sm font-semibold text-gray-900">
-                      {recipe.profiles?.username || recipe.profiles?.full_name || 'Recipe Author'}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {new Date(recipe.created_at).toLocaleDateString()}
-                    </p>
-                  </div>
+            {/* Author Section */}
+            <div className="flex items-center justify-between bg-gray-50 rounded-lg p-3">
+              <div className="flex items-center">
+                <div className="w-6 h-6 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-full flex items-center justify-center text-white font-bold text-xs">
+                  {recipe.profiles?.username?.charAt(0) || recipe.profiles?.full_name?.charAt(0) || 'U'}
                 </div>
-                <div className="text-xs text-gray-400">
-                  👨‍🍳 Chef
+                <div className="ml-2">
+                  <p className="text-sm font-semibold text-gray-900">
+                    {recipe.profiles?.username || recipe.profiles?.full_name || 'Recipe Author'}
+                  </p>
                 </div>
               </div>
+              <RecipeRating recipeId={recipe.id} recipeOwnerId={recipe.user_id} />
             </div>
           </div>
         </div>
 
-        {/* Compact Recipe Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
-          {/* Compact Ingredients */}
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+        {/* Recipe Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+          {/* Ingredients */}
+          <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
+            <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
               <span className="w-6 h-6 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center mr-2">
                 <span className="text-white text-xs">🥘</span>
               </span>
@@ -319,104 +378,58 @@ export default function RecipeDetailsPage({ params }: RecipeDetailsPageProps) {
             </h2>
             <ul className="space-y-2">
               {recipe.ingredients.map((ingredient, index) => (
-                <li key={index} className="flex items-start bg-gray-50 rounded-lg p-3">
-                  <span className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-orange-500 to-red-500 text-white rounded-full flex items-center justify-center text-xs font-bold mr-3 mt-0.5">
-                    {index + 1}
-                  </span>
-                  <span className="text-gray-800 text-sm leading-relaxed">{ingredient}</span>
+                <li key={index} className="flex items-start text-sm text-gray-700">
+                  <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                  {ingredient}
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Compact Instructions */}
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
-              <span className="w-6 h-6 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg flex items-center justify-center mr-2">
-                <span className="text-white text-xs">📋</span>
+          {/* Instructions */}
+          <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
+            <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
+              <span className="w-6 h-6 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-lg flex items-center justify-center mr-2">
+                <span className="text-white text-xs">📝</span>
               </span>
               Instructions
             </h2>
             <ol className="space-y-3">
               {recipe.instructions.map((instruction, index) => (
-                <li key={index} className="flex items-start bg-gray-50 rounded-lg p-3">
-                  <span className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-green-500 to-emerald-500 text-white rounded-full flex items-center justify-center text-xs font-bold mr-3 mt-0.5">
+                <li key={index} className="flex items-start text-sm text-gray-700">
+                  <span className="w-5 h-5 bg-emerald-500 text-white rounded-full flex items-center justify-center text-xs font-bold mr-3 flex-shrink-0 mt-0.5">
                     {index + 1}
                   </span>
-                  <p className="text-gray-800 text-sm leading-relaxed">{instruction}</p>
+                  {instruction}
                 </li>
               ))}
             </ol>
           </div>
         </div>
-
-        {/* Compact Action Buttons */}
-        <div className="flex justify-center space-x-4 mt-8">
-          <button
-            onClick={() => router.push('/recipes')}
-            className="border-2 border-emerald-600 text-emerald-600 px-6 py-3 rounded-xl font-semibold hover:bg-emerald-600 hover:text-white transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
-          >
-            Browse More Recipes
-          </button>
-          {user && user.id === recipe.user_id && (
-            <>
-              <button
-                onClick={() => router.push(`/recipes/${recipe.id}/edit`)}
-                className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-emerald-700 hover:to-teal-700 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
-              >
-                Edit Recipe
-              </button>
-              <button
-                onClick={() => setShowDeleteConfirm(true)}
-                className="bg-gradient-to-r from-red-600 to-red-700 text-white px-6 py-3 rounded-xl font-semibold hover:from-red-700 hover:to-red-800 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
-              >
-                Delete Recipe
-              </button>
-            </>
-          )}
-        </div>
-
-        {/* Ratings and Reviews */}
-        <div className="mt-8">
-          <RecipeRating recipeId={recipe.id} recipeOwnerId={recipe.user_id} />
-        </div>
       </main>
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-2xl border border-white/30 max-w-md mx-4">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-                <span className="text-white text-2xl">🗑️</span>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Delete Recipe</h3>
-              <p className="text-gray-600 mb-8 leading-relaxed">
-                Are you sure you want to delete "<span className="font-semibold text-gray-800">{recipe?.title}</span>"? 
-                This action cannot be undone and will permanently remove the recipe from the platform.
-              </p>
-              <div className="flex space-x-4">
-                <button
-                  onClick={() => setShowDeleteConfirm(false)}
-                  className="flex-1 border-2 border-gray-300 text-gray-700 px-6 py-3 rounded-2xl font-semibold hover:bg-gray-50 transition-all duration-300"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleDeleteRecipe}
-                  disabled={deleting}
-                  className="flex-1 bg-gradient-to-r from-red-600 to-red-700 text-white px-6 py-3 rounded-2xl font-semibold hover:from-red-700 hover:to-red-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {deleting ? (
-                    <div className="flex items-center justify-center">
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                      Deleting...
-                    </div>
-                  ) : (
-                    'Delete Recipe'
-                  )}
-                </button>
-              </div>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 max-w-md mx-4">
+            <h3 className="text-lg font-bold text-gray-900 mb-2">Delete Recipe</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Are you sure you want to delete "{recipe.title}"? This action cannot be undone.
+            </p>
+            <div className="flex space-x-3">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                className="flex-1 bg-gray-300 text-gray-700 px-4 py-2 rounded-lg font-semibold hover:bg-gray-400 transition-colors text-sm"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteRecipe}
+                disabled={deleting}
+                className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-700 transition-colors text-sm disabled:opacity-50"
+              >
+                {deleting ? 'Deleting...' : 'Delete'}
+              </button>
             </div>
           </div>
         </div>

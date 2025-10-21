@@ -49,16 +49,20 @@ export default function Dashboard() {
           }
 
         // Fetch reviews received count (reviews on user's recipes)
-        const { count: reviewsReceivedCount, error: reviewsReceivedError } = await supabase
-          .from('recipe_ratings')
-          .select('*', { count: 'exact', head: true })
-          .in('recipe_id', userRecipes.map(r => r.id))
+        if (recipesData && recipesData.length > 0) {
+          const { count: reviewsReceivedCount, error: reviewsReceivedError } = await supabase
+            .from('recipe_ratings')
+            .select('*', { count: 'exact', head: true })
+            .in('recipe_id', recipesData.map(r => r.id))
 
-        if (reviewsReceivedError) {
-          console.error('Error fetching reviews received count:', reviewsReceivedError)
-          setReviewsCount(0)
+          if (reviewsReceivedError) {
+            console.error('Error fetching reviews received count:', reviewsReceivedError)
+            setReviewsCount(0)
+          } else {
+            setReviewsCount(reviewsReceivedCount || 0)
+          }
         } else {
-          setReviewsCount(reviewsReceivedCount || 0)
+          setReviewsCount(0)
         }
 
         // Fetch reviews written count (reviews written by user)
@@ -120,14 +124,23 @@ export default function Dashboard() {
             setFavoritesCount(favoritesCount || 0)
           }
 
-          // Refresh reviews count
-          const { count: reviewsCount, error: reviewsError } = await supabase
-            .from('recipe_ratings')
-            .select('*', { count: 'exact', head: true })
+          // Refresh reviews received count (reviews on user's recipes)
+          const { data: userRecipes, error: recipesError } = await supabase
+            .from('recipes')
+            .select('id')
             .eq('user_id', user!.id)
 
-          if (!reviewsError) {
-            setReviewsCount(reviewsCount || 0)
+          if (!recipesError && userRecipes && userRecipes.length > 0) {
+            const { count: reviewsCount, error: reviewsError } = await supabase
+              .from('recipe_ratings')
+              .select('*', { count: 'exact', head: true })
+              .in('recipe_id', userRecipes.map(r => r.id))
+
+            if (!reviewsError) {
+              setReviewsCount(reviewsCount || 0)
+            }
+          } else {
+            setReviewsCount(0)
           }
 
           // Refresh profile data
@@ -207,7 +220,10 @@ export default function Dashboard() {
                 Profile
               </button>
               <button 
-                onClick={signOut}
+                onClick={async () => {
+                  await signOut()
+                  router.push('/')
+                }}
                 className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
               >
                 Sign Out
