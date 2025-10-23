@@ -253,13 +253,22 @@ export default function RecipeDetailsPage({ params }: RecipeDetailsPageProps) {
                 Dashboard
               </a>
               {user?.id === recipe.user_id && (
-                <button
-                  onClick={() => setShowDeleteConfirm(true)}
-                  className="inline-flex items-center bg-red-600 text-white px-3 py-2 rounded-lg font-semibold hover:bg-red-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 text-sm"
-                >
-                  <span className="text-sm mr-2">🗑️</span>
-                  Delete Recipe
-                </button>
+                <>
+                  <a
+                    href={`/recipes/${recipe.id}/edit`}
+                    className="inline-flex items-center bg-emerald-600 text-white px-3 py-2 rounded-lg font-semibold hover:bg-emerald-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 text-sm"
+                  >
+                    <span className="text-sm mr-2">✏️</span>
+                    Edit Recipe
+                  </a>
+                  <button
+                    onClick={() => setShowDeleteConfirm(true)}
+                    className="inline-flex items-center bg-red-600 text-white px-3 py-2 rounded-lg font-semibold hover:bg-red-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 text-sm"
+                  >
+                    <span className="text-sm mr-2">🗑️</span>
+                    Delete Recipe
+                  </button>
+                </>
               )}
             </div>
           </div>
