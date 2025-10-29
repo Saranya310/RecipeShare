@@ -105,13 +105,14 @@ export default function ImageUpload({ onImageUpload, currentImageUrl, disabled, 
           <img
             src={preview}
             alt="Recipe preview"
-            className="w-full h-48 object-contain rounded-lg border border-gray-300 bg-gray-50"
+            className="w-full h-48 sm:h-56 object-cover rounded-lg border border-gray-300 bg-gray-50"
+            loading="lazy"
           />
           {!disabled && (
             <button
               type="button"
               onClick={handleRemoveImage}
-              className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
+              className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors mobile-touch-target"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -125,7 +126,7 @@ export default function ImageUpload({ onImageUpload, currentImageUrl, disabled, 
       <div
         onClick={handleClick}
         className={`
-          border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors
+          border-2 border-dashed rounded-lg p-4 sm:p-6 text-center cursor-pointer transition-colors mobile-touch-target
           ${disabled 
             ? 'border-gray-300 bg-gray-50 cursor-not-allowed' 
             : 'border-emerald-300 hover:border-emerald-400 hover:bg-emerald-50'
@@ -139,6 +140,7 @@ export default function ImageUpload({ onImageUpload, currentImageUrl, disabled, 
           onChange={handleFileSelect}
           disabled={disabled}
           className="hidden"
+          capture="environment"
         />
         
         {uploading ? (
@@ -155,7 +157,7 @@ export default function ImageUpload({ onImageUpload, currentImageUrl, disabled, 
               {preview ? 'Change Image' : uploadText}
             </p>
             <p className="text-xs text-gray-500">
-              Click to select or drag and drop
+              Tap to select or take photo
             </p>
             <p className="text-xs text-gray-400 mt-1">
               PNG, JPG, GIF up to 5MB
@@ -177,8 +179,10 @@ export default function ImageUpload({ onImageUpload, currentImageUrl, disabled, 
             onImageUpload(e.target.value)
           }}
           disabled={disabled}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 text-gray-900 bg-white disabled:bg-gray-50"
+          className="w-full px-3 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-gray-900 bg-white disabled:bg-gray-50 text-base mobile-touch-target"
           placeholder="https://example.com/image.jpg"
+          autoComplete="off"
+          inputMode="url"
         />
         <p className="text-xs text-gray-500 mt-1">
           If upload fails, you can paste an image URL here instead

@@ -57,11 +57,11 @@ export default function MyRecipesPage() {
             const processedRecipes = (data || []).map(recipe => {
               const ratings = recipe.recipe_ratings || []
               const average_rating = ratings.length > 0 
-                ? ratings.reduce((sum: number, r: any) => sum + r.rating, 0) / ratings.length 
+                ? ratings.reduce((sum: number, r: { rating: number }) => sum + r.rating, 0) / ratings.length 
                 : null
               const total_ratings = ratings.length
               const recent_review = ratings.length > 0 
-                ? ratings.sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0]
+                ? ratings.sort((a: { created_at: string }, b: { created_at: string }) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0]
                 : null
 
               return {

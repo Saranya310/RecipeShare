@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { useAuth } from '@/lib/auth-context'
 import { supabase } from '@/lib/supabase'
 import RecipeCard from '@/components/recipe-card'
@@ -102,13 +103,13 @@ export default function FavoritesPage() {
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <a
+              <Link
                 href="/recipes"
                 className="inline-flex items-center bg-pink-600 text-white px-3 py-2 rounded-lg font-semibold hover:bg-pink-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 text-sm"
               >
                 <span className="text-sm mr-2">🔍</span>
                 Browse Recipes
-              </a>
+              </Link>
               <a 
                 href="/dashboard"
                 className="text-gray-700 hover:text-pink-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"

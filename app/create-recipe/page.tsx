@@ -169,7 +169,7 @@ export default function CreateRecipe() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-50">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-50 ios-safe-area">
       <RecipeNavigation 
         title="Create Recipe" 
         subtitle="Share your culinary masterpiece with the world"
@@ -177,16 +177,16 @@ export default function CreateRecipe() {
         backButtonPath="/dashboard"
       />
 
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="bg-white rounded-xl shadow-lg p-6 border border-white/20">
-          <div className="text-center mb-6">
-            <h1 className="text-xl font-bold text-gray-900 mb-1">
+      <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 mobile-padding">
+        <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 border border-white/20">
+          <div className="text-center mb-4 sm:mb-6">
+            <h1 className="text-lg sm:text-xl font-bold text-gray-900 mb-1">
               Create Your <span className="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 bg-clip-text text-transparent">Recipe</span>
             </h1>
-            <p className="text-sm text-gray-600">Share your culinary creativity with the community</p>
+            <p className="text-xs sm:text-sm text-gray-600">Share your culinary creativity with the community</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
             {/* Recipe Title */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">Recipe Title *</label>
@@ -196,8 +196,10 @@ export default function CreateRecipe() {
                 value={formData.title}
                 onChange={handleInputChange}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300 bg-white text-gray-900"
+                className="w-full px-3 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300 bg-white text-gray-900 text-base mobile-touch-target"
                 placeholder="Enter recipe title"
+                autoComplete="off"
+                autoCapitalize="words"
               />
             </div>
 
@@ -217,9 +219,11 @@ export default function CreateRecipe() {
                 name="description"
                 value={formData.description}
                 onChange={handleInputChange}
-                rows={2}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300 bg-white text-gray-900 resize-none"
+                rows={3}
+                className="w-full px-3 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300 bg-white text-gray-900 resize-none text-base mobile-touch-target"
                 placeholder="Describe your recipe..."
+                autoComplete="off"
+                autoCapitalize="sentences"
               />
             </div>
 
@@ -236,7 +240,7 @@ export default function CreateRecipe() {
             </div>
 
             {/* Recipe Details */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
               <div>
                 <label className="block text-xs font-semibold text-gray-700 mb-1">Prep Time (min)</label>
                 <input
@@ -244,9 +248,10 @@ export default function CreateRecipe() {
                   name="prep_time"
                   value={formData.prep_time}
                   onChange={handleInputChange}
-                  className="w-full px-2 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300 bg-white text-gray-900 text-sm"
+                  className="w-full px-3 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300 bg-white text-gray-900 text-base mobile-touch-target"
                   placeholder="15"
                   min="0"
+                  inputMode="numeric"
                 />
               </div>
 
@@ -257,9 +262,10 @@ export default function CreateRecipe() {
                   name="cook_time"
                   value={formData.cook_time}
                   onChange={handleInputChange}
-                  className="w-full px-2 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300 bg-white text-gray-900 text-sm"
+                  className="w-full px-3 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300 bg-white text-gray-900 text-base mobile-touch-target"
                   placeholder="30"
                   min="0"
+                  inputMode="numeric"
                 />
               </div>
 
@@ -270,9 +276,10 @@ export default function CreateRecipe() {
                   name="servings"
                   value={formData.servings}
                   onChange={handleInputChange}
-                  className="w-full px-2 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300 bg-white text-gray-900 text-sm"
+                  className="w-full px-3 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300 bg-white text-gray-900 text-base mobile-touch-target"
                   placeholder="4"
                   min="1"
+                  inputMode="numeric"
                 />
               </div>
 
@@ -282,7 +289,7 @@ export default function CreateRecipe() {
                   name="difficulty"
                   value={formData.difficulty}
                   onChange={handleInputChange}
-                  className="w-full px-2 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300 bg-white text-gray-900 text-sm"
+                  className="w-full px-3 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300 bg-white text-gray-900 text-base mobile-touch-target"
                 >
                   <option value="Easy">Easy</option>
                   <option value="Medium">Medium</option>
@@ -294,23 +301,25 @@ export default function CreateRecipe() {
             {/* Ingredients */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">Ingredients</label>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {formData.ingredients.map((ingredient, index) => (
                   <div key={index} className="flex items-center space-x-2">
-                    <span className="text-gray-500 text-sm w-6">{index + 1}.</span>
+                    <span className="text-gray-500 text-sm w-6 flex-shrink-0">{index + 1}.</span>
                     <input
                       type="text"
                       value={ingredient}
                       onChange={(e) => handleArrayInputChange('ingredients', index, e.target.value)}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300 bg-white text-gray-900"
+                      className="flex-1 px-3 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300 bg-white text-gray-900 text-base mobile-touch-target"
                       placeholder={`Ingredient ${index + 1}`}
                       required={index === 0}
+                      autoComplete="off"
+                      autoCapitalize="words"
                     />
                     {formData.ingredients.length > 1 && (
                       <button
                         type="button"
                         onClick={() => removeArrayItem('ingredients', index)}
-                        className="text-red-500 hover:text-red-700 p-1 rounded hover:bg-red-50 transition-colors"
+                        className="text-red-500 hover:text-red-700 p-2 rounded hover:bg-red-50 transition-colors mobile-touch-target flex-shrink-0"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -322,7 +331,7 @@ export default function CreateRecipe() {
                 <button
                   type="button"
                   onClick={() => addArrayItem('ingredients')}
-                  className="text-emerald-600 hover:text-emerald-800 flex items-center space-x-1 text-sm font-medium"
+                  className="text-emerald-600 hover:text-emerald-800 flex items-center space-x-2 text-sm font-medium mobile-touch-target w-full justify-center py-2"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -335,7 +344,7 @@ export default function CreateRecipe() {
             {/* Instructions */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">Instructions</label>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {formData.instructions.map((instruction, index) => (
                   <div key={index} className="flex items-start space-x-2">
                     <div className="flex-shrink-0 w-6 h-6 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center font-bold text-xs mt-1">
@@ -345,17 +354,19 @@ export default function CreateRecipe() {
                       <textarea
                         value={instruction}
                         onChange={(e) => handleArrayInputChange('instructions', index, e.target.value)}
-                        rows={2}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300 bg-white text-gray-900 resize-none"
+                        rows={3}
+                        className="w-full px-3 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300 bg-white text-gray-900 resize-none text-base mobile-touch-target"
                         placeholder={`Step ${index + 1}`}
                         required={index === 0}
+                        autoComplete="off"
+                        autoCapitalize="sentences"
                       />
                     </div>
                     {formData.instructions.length > 1 && (
                       <button
                         type="button"
                         onClick={() => removeArrayItem('instructions', index)}
-                        className="text-red-500 hover:text-red-700 p-1 rounded hover:bg-red-50 transition-colors mt-1"
+                        className="text-red-500 hover:text-red-700 p-2 rounded hover:bg-red-50 transition-colors mt-1 mobile-touch-target flex-shrink-0"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -367,7 +378,7 @@ export default function CreateRecipe() {
                 <button
                   type="button"
                   onClick={() => addArrayItem('instructions')}
-                  className="text-emerald-600 hover:text-emerald-800 flex items-center space-x-1 text-sm font-medium"
+                  className="text-emerald-600 hover:text-emerald-800 flex items-center space-x-2 text-sm font-medium mobile-touch-target w-full justify-center py-2"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -382,7 +393,7 @@ export default function CreateRecipe() {
               <button
                 type="submit"
                 disabled={loading}
-                className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-8 py-3 rounded-lg font-semibold hover:from-emerald-700 hover:to-teal-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-8 py-4 sm:py-3 rounded-lg font-semibold hover:from-emerald-700 hover:to-teal-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none mobile-touch-target w-full sm:w-auto"
               >
                 {loading ? 'Creating Recipe...' : 'Create Recipe'}
               </button>
@@ -393,7 +404,7 @@ export default function CreateRecipe() {
 
       {/* Toast Notifications */}
       {showToast && (
-        <div className="fixed top-4 right-4 z-50">
+        <div className="fixed top-4 right-4 left-4 sm:left-auto z-50">
           <div className={`px-4 py-3 rounded-lg shadow-lg border-l-4 ${
             toastType === 'success'
               ? 'bg-green-50 border-green-500 text-green-800'

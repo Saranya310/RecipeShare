@@ -40,7 +40,7 @@ export default function RecipeReviewsPage() {
         const { data: userRecipes, error: recipesError } = await supabase
           .from('recipes')
           .select('id, title')
-          .eq('user_id', user.id)
+          .eq('user_id', user?.id)
 
         if (recipesError) {
           console.error('Error fetching user recipes:', recipesError)
