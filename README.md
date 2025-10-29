@@ -40,8 +40,8 @@ It’s built to let anyone go from idea → publish in minutes.
 ![Landing page](./screenshots/landing.png)  
 ![Recipe detail view](./screenshots/sample_recipe.png)  
 ![User profile](./screenshots/profile.png)
-![Feeback/Reviews](./screenshots/reviews.png)
-![Discover Recipes](./screenshots/reviews.png)
+![Feedback/Reviews](./screenshots/reviews.png)
+![Discover Recipes](./screenshots/discover.png)
 ---
 
 ## 🚀 Quick Start  
