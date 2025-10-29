@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   experimental: {
-    // optimizeCss: true, // Temporarily disabled due to critters module issue
+    optimizeCss: true,
   },
   images: {
     formats: ['image/webp', 'image/avif'],

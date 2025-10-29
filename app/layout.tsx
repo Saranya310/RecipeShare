@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Zilla_Slab } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
-import MobileNavigation from "@/components/mobile-navigation";
 import PWAInstallPrompt from "@/components/pwa-install-prompt";
 import ServiceWorkerRegistration from "@/components/service-worker-registration";
 
@@ -54,10 +53,9 @@ export default function RootLayout({
         className={`${zillaSlab.variable} font-serif antialiased`}
       >
         <AuthProvider>
-          <div className="min-h-screen pb-16 sm:pb-0">
+          <div className="min-h-screen">
             {children}
           </div>
-          <MobileNavigation />
           <PWAInstallPrompt />
           <ServiceWorkerRegistration />
         </AuthProvider>

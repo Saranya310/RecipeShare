@@ -183,19 +183,19 @@ export default function Dashboard() {
       <nav className="relative bg-white/80 backdrop-blur-md shadow-lg border-b border-white/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-lg flex items-center justify-center shadow-lg">
+            <div className="flex items-center min-w-0 flex-1">
+              <div className="flex items-center space-x-2 sm:space-x-3">
+                <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-lg flex items-center justify-center shadow-lg flex-shrink-0">
                   <span className="text-white text-lg">🍳</span>
                 </div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 bg-clip-text text-transparent">
+                <h1 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 bg-clip-text text-transparent truncate">
                   RecipeShare
                 </h1>
               </div>
             </div>
-            <div className="flex items-center space-x-4">
-              {/* Enhanced User Avatar */}
-              <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
+              {/* Enhanced User Avatar - Hidden on mobile */}
+              <div className="hidden sm:flex items-center space-x-2">
                 {profile?.avatar_url ? (
                   <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-emerald-500 shadow-lg">
                     <img 
@@ -213,18 +213,20 @@ export default function Dashboard() {
                   Welcome, {profile?.username || profile?.full_name || user?.email?.split('@')[0] || 'Chef'}
                 </span>
               </div>
+              {/* Profile button - Hidden on mobile */}
               <button
                 onClick={() => router.push('/profile')}
-                className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                className="hidden sm:block text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium mobile-touch-target"
               >
                 Profile
               </button>
+              {/* Sign Out button - Always visible, mobile-friendly */}
               <button 
                 onClick={async () => {
                   await signOut()
                   router.push('/')
                 }}
-                className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                className="text-gray-600 hover:text-gray-900 px-2 sm:px-3 py-2 rounded-md text-xs sm:text-sm font-medium mobile-touch-target whitespace-nowrap"
               >
                 Sign Out
               </button>
