@@ -1,189 +1,176 @@
-# RecipeShare - Recipe Sharing Platform
+````markdown
+# RecipeShare  
+A modern recipe-sharing web app built with **Next.js 15**, **React 19**, **Supabase**, and **Tailwind CSS**.
 
-A modern, full-stack recipe sharing platform built with Next.js 15, React 19, Supabase, and Tailwind CSS.
+---
 
-## 🌟 Features
+## 📌 What it is  
+RecipeShare is a full-stack application where food lovers can **create**, **discover**, and **share** recipes.  
+Users can upload recipes with images, save favourites, rate and review, browse by category/difficulty, and manage their profile.  
+The goal: make sharing and finding great home-cooking easy and social.
 
-### Core Functionality
-- **User Authentication** - Secure sign-up, sign-in, and sign-out with Supabase Auth
-- **Recipe Management** - Create, read, update, and delete (CRUD) operations for recipes
-- **Recipe Discovery** - Browse and search recipes with filters by category, difficulty, and sorting options
-- **User Profiles** - Customizable user profiles with personal information
-- **Favorites System** - Save and manage favorite recipes
-- **Reviews & Ratings** - Rate and review recipes (1-5 stars with comments)
-- **Image Upload** - Upload recipe images to Supabase Storage
-- **Categories** - Organize recipes by categories (Breakfast, Lunch, Dinner, Desserts, Snacks, Beverages)
+---
 
-### User Interface
-- **Responsive Design** - Mobile-first approach with Tailwind CSS
-- **Modern UI** - Beautiful emerald/teal color scheme with gradient backgrounds
-- **Grid & List Views** - Toggle between different recipe viewing layouts
-- **Real-time Updates** - Dynamic content updates
-- **Toast Notifications** - User feedback for actions
-- **Loading States** - Smooth loading indicators
-- **Error Handling** - Graceful error messages and fallbacks
+## 🎯 Why it matters  
+Home-cooks often juggle scattered tools — note-apps, social media, cookbooks.  
+RecipeShare centralises this, adds social features (reviews, favourites), and wraps it all in a clean, modern UI.  
+It’s built to let anyone go from idea → publish in minutes.
 
-### Technical Features
-- **Server Components** - React Server Components for optimal performance
-- **Client Components** - Interactive UI with React hooks
-- **TypeScript** - Full type safety throughout the application
-- **Row Level Security** - Supabase RLS policies for data security
-- **Optimistic Updates** - Fast, responsive user experience
-- **SEO Optimized** - Meta tags and proper HTML structure
+---
 
-## 🚀 Tech Stack
+## 🛠️ Key Features  
+- User authentication (signup, login, logout) via Supabase  
+- CRUD for recipes (title, ingredients, steps, category, difficulty, image)  
+- Recipe discovery: browse, search, filter by category/difficulty, sort by popularity  
+- User profiles with personal info, recipes, and reviews  
+- Favourites system to save recipes you like  
+- Ratings & comments (1–5 stars + comments)  
+- Image uploads via Supabase Storage  
+- Responsive, mobile-first UI (Tailwind CSS)  
+- Grid/List recipe views  
+- Smooth UX with loading states, toasts, and error handling  
+- TypeScript for full type safety  
+- Server + Client Components (Next.js App Router)  
+- Supabase RLS (Row-Level Security)  
+- SEO-optimized structure and meta tags  
 
-- **Framework**: Next.js 15 (App Router)
-- **Frontend**: React 19, TypeScript
-- **Styling**: Tailwind CSS
-- **Backend**: Supabase (PostgreSQL, Auth, Storage)
-- **Deployment**: Vercel
+---
 
-## 📋 Prerequisites
+## 🎬 Screenshots  
+![Landing page](./screenshots/landing.png)  
+![Recipe detail view](./screenshots/sample_recipe.png)  
+![User profile](./screenshots/profile.png)
+![Feeback/Reviews](./screenshots/reviews.png)
+![Discover Recipes](./screenshots/reviews.png)
+---
 
-- Node.js 18.17 or later
-- npm or yarn
-- Supabase account
-- Git
+## 🚀 Quick Start  
 
-## 🛠️ Installation
+### Prerequisites  
+- Node.js 18.17 or later  
+- npm or yarn  
+- Supabase account  
+- Git  
 
-1. **Clone the repository**
+### Installation  
 ```bash
-git clone <your-repo-url>
-cd recipe_sharing
-```
-
-2. **Install dependencies**
-```bash
+git clone <YOUR_REPO_URL>
+cd recipeshare
 npm install
-```
+````
 
-3. **Set up environment variables**
+### Configuration
 
-Create a `.env.local` file in the root directory:
+Create a file `.env.local` in the root directory and add:
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
-4. **Set up Supabase**
+### Setup Supabase
 
-5. **Set up Supabase Storage**
+1. In your Supabase dashboard, go to **Storage** → create a bucket named `recipe-images`.
+2. Set the bucket as **public** (or configure access to your preference).
+3. Configure RLS policies for the `recipes`, `reviews`, and `favourites` tables.
 
-Create a storage bucket named `recipe-images`:
-- Go to Storage in Supabase Dashboard
-- Create new bucket: `recipe-images`
-- Make it public
-- Set up RLS policies for the bucket
+### Run the app
 
-6. **Run the development server**
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-## 📁 Project Structure
-
-```
-recipe_sharing/
-├── app/                      # Next.js app directory
-│   ├── create-recipe/       # Create recipe page
-│   ├── favorites/           # Favorites page
-│   ├── my-recipes/          # User's recipes page
-│   ├── my-reviews/          # User's reviews page
-│   ├── profile/             # User profile page
-│   ├── recipe-reviews/      # Recipe reviews page
-│   ├── recipes/             # Recipe pages
-│   │   ├── [id]/           # Recipe detail page
-│   │   │   └── edit/       # Edit recipe page
-│   │   └── page.tsx        # Discover recipes page
-│   ├── dashboard/           # User dashboard
-│   ├── layout.tsx           # Root layout
-│   ├── page.tsx             # Landing page
-│   └── globals.css          # Global styles
-├── components/              # Reusable components
-│   ├── auth-modal.tsx      # Authentication modal
-│   ├── category-selector.tsx
-│   ├── dashboard.tsx        # Dashboard component
-│   ├── image-upload.tsx     # Image upload component
-│   ├── recipe-card.tsx      # Recipe card component
-│   ├── recipe-navigation.tsx
-│   └── recipe-rating.tsx    # Rating component
-├── lib/                     # Utility libraries
-│   ├── auth-context.tsx    # Authentication context
-│   └── supabase.ts         # Supabase client
-├── public/                  # Static assets
-├── .env.local              # Environment variables (not in git)
-├── .gitignore              # Git ignore file
-├── next.config.ts          # Next.js configuration
-├── package.json            # Dependencies
-├── tailwind.config.ts      # Tailwind configuration
-└── tsconfig.json           # TypeScript configuration
-```
-
-## 🚀 Deployment
-
-### Vercel Deployment
-
-1. **Push to GitHub**
-```bash
-git init
-git add .
-git commit -m "Initial commit"
-git branch -M main
-git remote add origin <your-github-repo-url>
-git push -u origin main
-```
-
-2. **Deploy to Vercel**
-- Go to [vercel.com](https://vercel.com)
-- Import your GitHub repository
-- Add environment variables:
-  - `NEXT_PUBLIC_SUPABASE_URL`
-  - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- Deploy!
-
-### Environment Variables
-
-Make sure to add these environment variables in Vercel:
-- `NEXT_PUBLIC_SUPABASE_URL` - Your Supabase project URL
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Your Supabase anonymous key
-
-## 🎯 Features Roadmap
-
-- [ ] Social sharing
-- [ ] Recipe collections
-- [ ] Advanced search filters
-- [ ] Ingredient-based search
-- [ ] Meal planning
-- [ ] Shopping lists
-- [ ] Recipe scaling
-- [ ] Nutritional information
-- [ ] Print-friendly recipe cards
-- [ ] Recipe import from URLs
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## 📝 License
-
-This project is licensed under the MIT License.
-
-## 👤 Author
-
-Your Name
-
-## 🙏 Acknowledgments
-
-- Next.js team for the amazing framework
-- Supabase for the backend infrastructure
-- Tailwind CSS for the styling system
-- Vercel for hosting
+Visit [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-Made with ❤️ and React
+## 📂 Project Structure
+
+```
+src/
+├── app/                # Next.js App Router pages and layouts
+│   ├── create-recipe/
+│   ├── favourites/
+│   ├── my-recipes/
+│   ├── profile/
+│   ├── recipes/
+│   │   ├── [id]/
+│   │   │   └── edit/
+│   │   └── page.tsx
+│   ├── dashboard/
+│   ├── layout.tsx
+│   └── globals.css
+├── components/         # Reusable UI components
+├── lib/                # Utility modules (auth context, Supabase client)
+├── public/             # Static assets
+├── .env.local          # Local env vars (gitignored)
+├── tailwind.config.ts  # Tailwind config
+├── tsconfig.json       # TypeScript config
+├── next.config.ts      # Next.js config
+└── package.json
+```
+
+---
+
+## 🚀 Deployment
+
+### Deploy to Vercel
+
+1. Go to [Vercel](https://vercel.com) → **Add New Project** → select this GitHub repo.
+2. Add your Supabase environment variables:
+
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+   ```
+3. Click **Deploy** — Vercel builds and hosts automatically.
+4. Your app will be live at a URL like `https://recipeshare.vercel.app`.
+5. *(Optional)* Add a custom domain under **Settings → Domains**.
+
+---
+
+## 📈 Roadmap
+
+**Planned**
+
+* Social sharing (share recipes or copy link)
+* Recipe collections (personal “cookbooks”)
+* Ingredient-based search
+* Meal planning & shopping lists
+
+**Long-Term / Maybe**
+
+* Recipe scaling (adjust ingredients)
+* Nutritional information
+* Print-friendly recipe cards
+* Import recipes from external URLs
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome!
+
+1. Fork the repository
+2. Create a new branch (`git checkout -b feature/your-feature`)
+3. Make changes and commit
+4. Push to your fork and open a Pull Request
+5. Follow the existing style (Tailwind + TypeScript)
+6. Add docs/tests for new features
+
+---
+
+## 👤 Author
+
+**Saranya Achanti**
+
+---
+
+## 🙏 Acknowledgments
+
+* Thanks to the **Next.js** team for the framework
+* Thanks to **Supabase** for backend services
+* Thanks to **Tailwind Labs** for the styling system
+* Inspired by many recipe-sharing sites and open-source communities
+
+```
