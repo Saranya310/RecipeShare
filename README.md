@@ -1,4 +1,3 @@
-````markdown
 # RecipeShare  
 A modern recipe-sharing web app built with **Next.js 15**, **React 19**, **Supabase**, and **Tailwind CSS**.
 
@@ -172,5 +171,3 @@ Contributions are welcome!
 * Thanks to **Supabase** for backend services
 * Thanks to **Tailwind Labs** for the styling system
 * Inspired by many recipe-sharing sites and open-source communities
-
-```
