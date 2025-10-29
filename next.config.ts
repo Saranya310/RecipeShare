@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   experimental: {
-    optimizeCss: true,
+    // optimizeCss: true, // Disabled due to Vercel deployment issues
   },
   images: {
     formats: ['image/webp', 'image/avif'],
