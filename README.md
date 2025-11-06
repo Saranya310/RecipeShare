@@ -49,6 +49,14 @@ It’s built to let anyone go from idea → publish in minutes.
 ## 🎬 Screenshots
 
 Here’s a visual walkthrough of key pages and flows inside **RecipeShare**.
+---
+### 🧭 User Flow (Mermaid Export)
+![UserFlowDiagram](./public/screenshots/user-flow.png)
+
+---
+### 🏗️ Architecture & Database  
+![SystemArchitectureDiagram](./public/screenshots/architecture.png)  
+![Entity Relationship Diagram (ERD)](./public/screenshots/erd.png)
 
 ### 🏠 Core Screens  
 ![LandingPage](./public/screenshots/LandingPage.png)  
@@ -78,17 +86,6 @@ Here’s a visual walkthrough of key pages and flows inside **RecipeShare**.
 ### 👤 User & Profile  
 ![Profile](./public/screenshots/Profile.png)  
 ![SupabaseSchemas](./public/screenshots/Supabase_Schemas.png)
-
----
-
-### 🧭 User Flow (Mermaid Export)
-![UserFlowDiagram](./public/screenshots/user-flow.png)
-
----
-
-### 🏗️ Architecture & Database  
-![SystemArchitectureDiagram](./public/screenshots/architecture.png)  
-![EntityRelationshipDiagram(ERD)](./public/screenshots/erd.png)
 
 ---
 
