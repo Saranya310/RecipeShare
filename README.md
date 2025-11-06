@@ -46,7 +46,7 @@ It’s built to let anyone go from idea → publish in minutes.
 
 ---
 
-## 🎬 Screenshots
+## Screenshots
 
 Here’s a visual walkthrough of key pages and flows inside **RecipeShare**.
 ---
@@ -54,38 +54,46 @@ Here’s a visual walkthrough of key pages and flows inside **RecipeShare**.
 ![UserFlowDiagram](./public/screenshots/user-flow.png)
 
 ---
-### 🏗️ Architecture & Database  
+### Architecture 
 ![SystemArchitectureDiagram](./public/screenshots/architecture.png)  
+### Database - ERD
 ![Entity Relationship Diagram (ERD)](./public/screenshots/erd.png)
 
+---
+### User & Profile  
+![Profile](./public/screenshots/Profile.png)  
+### Supabase Schema
+![SupabaseSchemas](./public/screenshots/Supabase_Schemas.png)
+
+---
 ### 🏠 Core Screens  
 ![LandingPage](./public/screenshots/LandingPage.png)  
+
 ![UserLandingPage](./public/screenshots/UserLandingPage.png)  
-![LogIn](./public/screenshots/LogIn.png)  
+
 ![SignUp](./public/screenshots/SignUp.png)
 
 ---
 
 ### 🍳 Recipe Creation & Management  
 ![CreateRecipePage](./public/screenshots/CreateRecipePage.png)  
+
 ![UpdatingRecipePage](./public/screenshots/UpdatingRecipePage.png)  
+
 ![MyRecipesPage](./public/screenshots/MyRecipesPage.png)  
+
 ![RecipeCard](./public/screenshots/RecipeCard.png)
 
 ---
 
 ### 🔍 Discovery & Interaction  
 ![DiscoverRecipesPage](./public/screenshots/DiscoverRecipesPage.png)  
+
 ![FavoritesPage](./public/screenshots/FavoritesPage.png)  
+
 ![FeedbackReviewsPage](./public/screenshots/FeedbackReviewsPage.png)  
+
 ![MyReviewsPage](./public/screenshots/MyReviewsPage.png)  
-![ReviewsPage](./public/screenshots/ReviewsPage.png)
-
----
-
-### 👤 User & Profile  
-![Profile](./public/screenshots/Profile.png)  
-![SupabaseSchemas](./public/screenshots/Supabase_Schemas.png)
 
 ---
 
