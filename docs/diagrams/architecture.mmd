@@ -1,19 +1,22 @@
-%%{init: {'theme':'neutral'}}%%
 flowchart LR
   subgraph Client[Browser]
     UI[Next.js 15 UI<br/>React 19]
   end
+
   subgraph NextApp[Next.js App Router]
     SR[Server Components]
     CR[Client Components]
-    API[/Route Handlers & Server Actions/]
+    API[/Route Handlers/]
   end
+
   subgraph Supabase[Supabase Project]
-    AUTH[Auth (JWT)]
+    AUTH[Auth]
     DB[(Postgres + RLS)]
     STRG[(Storage: recipe-images)]
   end
-  Vercel[Vercel Hosting & Edge Network]
+
+  Vercel[Vercel Hosting/CDN]
+
   UI --> NextApp
   NextApp -->|fetch| API
   API --> AUTH
