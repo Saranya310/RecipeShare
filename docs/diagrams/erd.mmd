@@ -1,0 +1,45 @@
+%%{init: {'theme':'neutral'}}%%
+erDiagram
+  profiles ||--o{ recipes : "author_id"
+  profiles ||--o{ reviews : "user_id"
+  profiles ||--o{ favourites : "user_id"
+  recipes  ||--o{ reviews : "recipe_id"
+  recipes  ||--o{ favourites : "recipe_id"
+
+  profiles {
+    uuid id PK "maps to auth.users.id"
+    text display_name
+    text avatar_url
+    timestamptz created_at
+    timestamptz updated_at
+  }
+
+  recipes {
+    uuid id PK
+    uuid author_id FK
+    text title
+    text category
+    text difficulty
+    jsonb ingredients_json "array of {qty,unit,item,notes}"
+    text  steps_md        "markdown"
+    text  image_path      "storage key"
+    int   popularity_score
+    timestamptz created_at
+    timestamptz updated_at
+  }
+
+  reviews {
+    uuid id PK
+    uuid recipe_id FK
+    uuid user_id FK
+    int  rating          "1–5"
+    text comment
+    timestamptz created_at
+  }
+
+  favourites {
+    uuid id PK
+    uuid recipe_id FK
+    uuid user_id FK
+    timestamptz created_at
+  }

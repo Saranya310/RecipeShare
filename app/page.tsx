@@ -1,6 +1,5 @@
 'use client'
 
-import Image from "next/image";
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { supabase } from '@/lib/supabase'

@@ -41,8 +41,6 @@ export default function DiscoverRecipesPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        console.log('🍳 Starting to fetch recipes and categories...')
-        
         // Fetch recipes with rating data
         const { data: recipesData, error: recipesError } = await supabase
           .from('recipes')
@@ -65,8 +63,6 @@ export default function DiscoverRecipesPage() {
           console.error('❌ Error fetching recipes:', recipesError)
           setRecipes([])
         } else {
-          console.log('✅ Successfully fetched', recipesData?.length || 0, 'recipes from database')
-          
           // Process recipes to include rating data
           const processedRecipes = (recipesData || []).map(recipe => {
             const ratings = recipe.recipe_ratings || []
@@ -99,7 +95,6 @@ export default function DiscoverRecipesPage() {
           console.error('❌ Error fetching categories:', categoriesError)
           setCategories([])
         } else {
-          console.log('✅ Successfully fetched', categoriesData?.length || 0, 'categories')
           setCategories(categoriesData || [])
         }
       } catch (error) {

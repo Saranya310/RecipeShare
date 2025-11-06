@@ -52,7 +52,6 @@ export default function MyRecipesPage() {
             console.error('Error fetching recipes:', error)
             setRecipes([])
           } else {
-            console.log('✅ Successfully fetched recipes:', data?.length || 0, 'recipes')
             // Process recipes to include rating data
             const processedRecipes = (data || []).map(recipe => {
               const ratings = recipe.recipe_ratings || []
@@ -80,7 +79,6 @@ export default function MyRecipesPage() {
           setLoading(false)
         }
       } else {
-        console.log('❌ No user found, redirecting to login')
         setLoading(false)
         router.push('/')
       }

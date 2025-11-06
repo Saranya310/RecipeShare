@@ -47,11 +47,13 @@ export default function ImageUpload({ onImageUpload, currentImageUrl, disabled, 
         .upload(filePath, file)
 
       if (uploadError) {
-        console.error('Upload error:', uploadError)
-        console.error('Bucket name:', bucketName)
-        console.error('File path:', filePath)
-        console.error('File size:', file.size)
-        console.error('File type:', file.type)
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Upload error:', uploadError)
+          console.error('Bucket name:', bucketName)
+          console.error('File path:', filePath)
+          console.error('File size:', file.size)
+          console.error('File type:', file.type)
+        }
         
         // More specific error messages
         if (uploadError.message.includes('Bucket not found') || uploadError.message.includes('404')) {

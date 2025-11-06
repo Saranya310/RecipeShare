@@ -1,0 +1,16 @@
+%%{init: {'theme':'neutral'}}%%
+flowchart TD
+  Start([Visitor]) --> Auth[Sign Up / Login]
+  Auth --> Browse[Browse / Search / Filter]
+  Browse --> Recipe[Recipe Details]
+  Browse --> Create[Create Recipe]
+  Create --> Recipe
+  Recipe --> Fav[Save Favourite]
+  Recipe --> Review[Rate & Comment]
+  Fav --> Profile[Profile]
+  Review --> Profile
+  Profile --> My[My Recipes]
+  My --> Edit[Edit]
+  Edit --> Recipe
+  Profile --> Logout[Logout]
+  Logout --> Start

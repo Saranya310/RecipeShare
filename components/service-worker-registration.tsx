@@ -8,15 +8,19 @@ export default function ServiceWorkerRegistration() {
       try {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('/sw.js')
-            .then((registration) => {
-              console.log('SW registered: ', registration)
+            .then(() => {
+              // Service worker registered successfully
             })
             .catch((registrationError) => {
-              console.log('SW registration failed: ', registrationError)
+              if (process.env.NODE_ENV === 'development') {
+                console.error('SW registration failed: ', registrationError)
+              }
             })
         })
       } catch (error) {
-        console.log('Service worker registration error: ', error)
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Service worker registration error: ', error)
+        }
       }
     }
   }, [])

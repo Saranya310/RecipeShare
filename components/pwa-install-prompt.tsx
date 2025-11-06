@@ -35,8 +35,10 @@ export default function PWAInstallPrompt() {
         window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
         window.removeEventListener('appinstalled', handleAppInstalled)
       }
-    } catch (error) {
-      console.log('PWA install prompt error: ', error)
+      } catch (error) {
+        if (process.env.NODE_ENV === 'development') {
+          console.error('PWA install prompt error: ', error)
+        }
     }
   }, [])
 
@@ -46,10 +48,10 @@ export default function PWAInstallPrompt() {
     deferredPrompt.prompt()
     const { outcome } = await deferredPrompt.userChoice
     
-    if (outcome === 'accepted') {
-      console.log('User accepted the install prompt')
-    } else {
-      console.log('User dismissed the install prompt')
+        if (outcome === 'accepted') {
+          // User accepted the install prompt
+        } else {
+          // User dismissed the install prompt
     }
     
     setDeferredPrompt(null)
